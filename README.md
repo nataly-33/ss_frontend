@@ -1,4 +1,3 @@
-
 # Smart Sales — Frontend (React + TypeScript + Vite)
 
 Frontend del proyecto SmartSales365: aplicación web en React + TypeScript construida con Vite y Tailwind CSS. Esta repo contiene la UI pública que consume la API del backend (Django REST).
