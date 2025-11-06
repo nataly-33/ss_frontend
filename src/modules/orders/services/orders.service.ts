@@ -1,104 +1,67 @@
 import api from "@core/config/api.config";
-
-export interface OrderItem {
-  id: string;
-  prenda: {
-    id: string;
-    nombre: string;
-    slug: string;
-    imagen_principal?: string;
-  };
-  talla: {
-    id: string;
-    nombre: string;
-  };
-  cantidad: number;
-  precio_unitario: number;
-  subtotal: number;
-}
-
-export interface Order {
-  id: string;
-  numero_pedido: string;
-  usuario: {
-    id: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
-  items: OrderItem[];
-  estado: string;
-  total: number;
-  direccion_envio: any;
-  metodo_pago: {
-    id: string;
-    nombre: string;
-    tipo: string;
-  };
-  fecha_creacion: string;
-  fecha_actualizacion: string;
-}
-
-export interface PaymentMethod {
-  id: string;
-  nombre: string;
-  tipo: string;
-  activo: boolean;
-  descripcion?: string;
-}
-
-export interface CheckoutData {
-  direccion_envio_id: string;
-  metodo_pago_id: string;
-  items?: {
-    prenda_id: string;
-    talla_id: string;
-    cantidad: number;
-  }[];
-  notas?: string;
-}
+import { ENDPOINTS } from "@/core/config/endpoints";
+import type { 
+  Order, 
+  PaymentMethod, 
+  CheckoutData, 
+  OrdersParams,
+  StripePaymentData 
+} from "../types";
 
 export const ordersService = {
   // Orders
-  async getOrders(params?: any): Promise<Order[]> {
-    const response = await api.get<Order[]>("/orders/pedidos/", { params });
-    return response.data;
+  async getOrders(params?: OrdersParams): Promise<Order[]> {
+    const response = await api.get<{ results: Order[] }>(
+      ENDPOINTS.ORDERS.BASE, 
+      { params }
+    );
+    return response.data.results || response.data;
+  },
+
+  async getMyOrders(): Promise<Order[]> {
+    const response = await api.get<{ results: Order[] }>(
+      ENDPOINTS.ORDERS.MY_ORDERS
+    );
+    return response.data.results || response.data;
   },
 
   async getOrder(orderId: string): Promise<Order> {
-    const response = await api.get<Order>(`/orders/pedidos/${orderId}/`);
+    const response = await api.get<Order>(ENDPOINTS.ORDERS.BY_ID(orderId));
     return response.data;
   },
 
   async createOrder(data: CheckoutData): Promise<Order> {
-    const response = await api.post<Order>("/orders/pedidos/", data);
+    const response = await api.post<Order>(ENDPOINTS.ORDERS.CREATE, data);
     return response.data;
   },
 
-  async updateOrderStatus(orderId: string, estado: string) {
-    const response = await api.patch(`/orders/pedidos/${orderId}/`, {
-      estado,
-    });
+  async updateOrderStatus(orderId: string, estado: string): Promise<Order> {
+    const response = await api.patch<Order>(
+      ENDPOINTS.ORDERS.UPDATE_STATUS(orderId),
+      { estado }
+    );
     return response.data;
   },
 
-  async cancelOrder(orderId: string) {
-    const response = await api.post(`/orders/pedidos/${orderId}/cancel/`);
+  async cancelOrder(orderId: string): Promise<Order> {
+    const response = await api.post<Order>(
+      ENDPOINTS.ORDERS.CANCEL(orderId)
+    );
     return response.data;
   },
 
   // Payment Methods
   async getPaymentMethods(): Promise<PaymentMethod[]> {
-    const response = await api.get<PaymentMethod[]>("/orders/metodos-pago/");
-    return response.data;
+    // Este endpoint puede estar en ORDERS o crear uno nuevo
+    const response = await api.get<{ results: PaymentMethod[] }>(
+      "/api/orders/metodos-pago/"
+    );
+    return response.data.results || response.data;
   },
 
   // Stripe Payment
-  async processStripePayment(orderId: string, paymentMethodId: string) {
-    const response = await api.post("/orders/process-payment/", {
-      order_id: orderId,
-      payment_method_id: paymentMethodId,
-    });
+  async processStripePayment(data: StripePaymentData): Promise<any> {
+    const response = await api.post("/api/orders/process-payment/", data);
     return response.data;
   },
 };
