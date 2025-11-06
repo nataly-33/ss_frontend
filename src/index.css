@@ -1,16 +1,57 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* Variables CSS para colores */
+  :root {
+    /* Colores principales */
+    --color-primary-light: #E2B8AD;
+    --color-primary-main: #CFA195;
+    --color-primary-dark: #87564B;
+    --color-primary-darker: #6D322A;
+    
+    /* Colores neutros */
+    --color-neutral-lightest: #FAF9F8;
+    --color-neutral-light: #F5F3F1;
+    --color-neutral-medium: #D2BDAB;
+    --color-neutral-dark: #A59383;
+    --color-neutral-darker: #6D3222;
+    --color-neutral-text: #333333;
+    
+    /* Colores de acento */
+    --color-accent-chocolate: #6D3222;
+    --color-accent-chocolate-hover: #6D322A;
+    --color-accent-mauve: #87564B;
+    --color-accent-rose: #CFA195;
+    --color-accent-cream: #E2B8AD;
+    
+    /* Texto */
+    --color-text-primary: #333333;
+    --color-text-important: #6D322A;
+    --color-text-secondary: #6D3222;
+    --color-text-muted: #A59383;
+    
+    /* Fondos */
+    --color-bg-main: #D2BDAB;
+    --color-bg-card: #A59383;
+    --color-bg-header: #E2B8AD;
+    
+    /* Estados */
+    --color-success: #60a67a;
+    --color-warning: #d3b34a;
+    --color-error: #ab5151;
+    --color-info: #53759c;
+  }
+
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-neutral-900 font-sans antialiased;
+    @apply bg-background text-neutral-text font-serif antialiased;
   }
 
   h1,
@@ -19,7 +60,19 @@
   h4,
   h5,
   h6 {
-    @apply text-neutral-900;
+    @apply text-text-important font-display font-bold;
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl;
   }
 }
 
