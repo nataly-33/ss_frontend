@@ -4,51 +4,74 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Paleta Rosita + Café
+        // Colores principales (tonos rosados/crema)
         primary: {
-          50: "#fdf2f8",
-          100: "#fce7f3",
-          200: "#fbcfe8",
-          300: "#f9a8d4",
-          400: "#f472b6",
-          500: "#ec4899",
-          600: "#db2777",
-          700: "#be185d",
-          800: "#9d174d",
-          900: "#831843",
+          light: "#E2B8AD",
+          main: "#CFA195",
+          dark: "#87564B",
+          darker: "#6D322A",
+          DEFAULT: "#CFA195",
         },
+        
+        // Colores neutros
         neutral: {
-          50: "#fafaf9",
-          100: "#f5f5f4",
-          200: "#e7e5e4",
-          300: "#d6d3d1",
-          400: "#a8a29e",
-          500: "#78716c",
-          600: "#57534e",
-          700: "#44403c",
-          800: "#292524",
-          900: "#1c1917",
+          lightest: "#FAF9F8",
+          light: "#F5F3F1",
+          medium: "#D2BDAB",
+          dark: "#A59383",
+          darker: "#6D3222",
+          text: "#333333",
+          DEFAULT: "#333333",
         },
-        // Semantic tokens
-        background: {
-          DEFAULT: "#fdf2f8",
-          dark: "#1c1917",
-        },
-        text: {
-          DEFAULT: "#1c1917",
-          light: "#78716c",
-        },
-        border: {
-          DEFAULT: "#e7e5e4",
-        },
+        
+        // Colores de acento
         accent: {
-          rose: "#f9a8d4",
-          cafe: "#78716c",
+          chocolate: "#6D3222",
+          chocolateHover: "#6D322A",
+          mauve: "#87564B",
+          rose: "#CFA195",
+          cream: "#E2B8AD",
+          beige: "#A59383",
+          DEFAULT: "#87564B",
+        },
+        
+        // Estados (feedback visual)
+        success: "#60a67a",
+        warning: "#d3b34a",
+        error: "#ab5151",
+        info: "#53759c",
+        
+        // Texto (jerarquía de contenido)
+        text: {
+          primary: "#333333",
+          important: "#6D322A",
+          secondary: "#6D3222",
+          muted: "#A59383",
+          light: "#D2BDAB",
+          DEFAULT: "#333333",
+        },
+        
+        // Fondos y superficies
+        background: {
+          main: "#D2BDAB",
+          card: "#A59383",
+          header: "#E2B8AD",
+          light: "#FAF9F8",
+          DEFAULT: "#D2BDAB",
+        },
+        
+        // Bordes
+        border: {
+          light: "#E2B8AD",
+          main: "#D2BDAB",
+          dark: "#A59383",
+          DEFAULT: "#D2BDAB",
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Playfair Display", "serif"],
+        sans: ['"Source Serif 4"', 'Georgia', 'serif'],
+        serif: ['"Source Serif 4"', 'Georgia', 'serif'],
+        display: ['"Playfair Display"', 'serif'],
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
