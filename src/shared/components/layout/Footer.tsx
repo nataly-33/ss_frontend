@@ -11,12 +11,12 @@ import {
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-primary-900 text-neutral-300">
+    <footer className="bg-neutral-light text-text-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <h3 className="text-2xl font-display font-bold text-white mb-4">
+            <h3 className="text-2xl font-display font-bold text-accent-chocolate mb-4">
               SmartSales365
             </h3>
             <p className="text-sm mb-4">
@@ -25,19 +25,19 @@ export const Footer: React.FC = () => {
             <div className="flex gap-4">
               <a
                 href="#"
-                className="text-neutral-400 hover:text-white transition-colors"
+                className="text-neutral-400 hover:text-primary-dark transition-colors"
               >
                 <Facebook size={20} />
               </a>
               <a
                 href="#"
-                className="text-neutral-400 hover:text-white transition-colors"
+                className="text-neutral-400 hover:text-primary-dark transition-colors"
               >
                 <Instagram size={20} />
               </a>
               <a
                 href="#"
-                className="text-neutral-400 hover:text-white transition-colors"
+                className="text-neutral-400 hover:text-primary-dark transition-colors"
               >
                 <Twitter size={20} />
               </a>
@@ -46,12 +46,12 @@ export const Footer: React.FC = () => {
 
           {/* Shop */}
           <div>
-            <h4 className="font-semibold text-white mb-4">Tienda</h4>
+            <h4 className="font-semibold text-accent-chocolate mb-4">Tienda</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   to="/products"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-primary-dark transition-colors"
                 >
                   Todos los Productos
                 </Link>
@@ -59,7 +59,7 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/new-arrivals"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-primary-dark transition-colors"
                 >
                   Nuevos Ingresos
                 </Link>
@@ -67,13 +67,13 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/featured"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-primary-dark transition-colors"
                 >
                   Destacados
                 </Link>
               </li>
               <li>
-                <Link to="/sale" className="hover:text-white transition-colors">
+                <Link to="/sale" className="hover:text-primary-dark transition-colors">
                   Ofertas
                 </Link>
               </li>
@@ -82,12 +82,12 @@ export const Footer: React.FC = () => {
 
           {/* Help */}
           <div>
-            <h4 className="font-semibold text-white mb-4">Ayuda</h4>
+            <h4 className="font-semibold text-accent-chocolate mb-4">Ayuda</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   to="/contact"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-primary-dark transition-colors"
                 >
                   Contacto
                 </Link>
@@ -95,7 +95,7 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/shipping"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-primary-dark transition-colors"
                 >
                   Envíos
                 </Link>
@@ -103,13 +103,16 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/returns"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-primary-dark transition-colors"
                 >
                   Devoluciones
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="hover:text-white transition-colors">
+                <Link
+                  to="/faq"
+                  className="hover:text-primary-dark transition-colors"
+                >
                   Preguntas Frecuentes
                 </Link>
               </li>
@@ -118,7 +121,7 @@ export const Footer: React.FC = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold text-white mb-4">Contacto</h4>
+            <h4 className="font-semibold text-accent-chocolate mb-4">Contacto</h4>
             <ul className="space-y-3 text-sm">
               <li className="flex items-center gap-2">
                 <MapPin size={16} className="flex-shrink-0" />
