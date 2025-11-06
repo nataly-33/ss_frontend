@@ -5,8 +5,8 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { AdminRoute } from "./AdminRoute";
 
 // Auth Pages
-import { LoginPage } from "@modules/auth/pages/LoginPage";
-import { RegisterPage } from "@modules/auth/pages/RegisterPage";
+import  LoginPage  from "@modules/auth/pages/LoginPage";
+import RegisterPage  from "@modules/auth/pages/RegisterPage";
 
 // Public Pages
 import { HomePage } from "@modules/products/pages/HomePage";
@@ -14,20 +14,20 @@ import { ProductsPage } from "@modules/products/pages/ProductsPage";
 import { ProductDetailPage } from "@/modules/products/pages/ProductDetailPage";
 
 // Protected Pages
-import { CartPage } from "@modules/cart/pages/CartPage";
+import CartPage from "@/modules/cart/pages/CartPage";
 import { CheckoutPage } from "@/modules/checkout/pages/CheckoutPage";
-import { ProfilePage } from "@modules/customers/pages/ProfilePage";
-import { OrdersPage } from "@modules/orders/pages/OrdersPage";
-import { OrderDetailPage } from "@/modules/orders/pages/OrderDetailPage";
+import  ProfilePage  from "@modules/customers/pages/ProfilePage";
+import  OrdersPage from "@modules/orders/pages/OrdersPage";
+import  OrderDetailPage  from "@modules/orders/pages/OrderDetailPage";
 import { FavoritesPage } from "@modules/customers/pages/FavoritesPage";
 
 // Admin Pages
-import { AdminDashboard } from "@modules/dashboard/pages/AdminDashboard";
+import { AdminDashboard } from "@/modules/admin/pages/AdminDashboard";
 //import { DashboardOverview } from "@modules/dashboard/pages/DashboardOverview";
-import { UsersManagement } from "@/modules/dashboard/pages/UsersManagment";
-import { ProductsManagement } from "@modules/dashboard/pages/ProductsManagement";
-import { CategoriesManagement } from "@modules/dashboard/pages/CategoriesManagement";
-import { RolesManagement } from "@/modules/dashboard/pages/RolesManagment";
+import { UsersManagement } from "@/modules/admin/pages/UsersManagment";
+import { ProductsManagement } from "@/modules/admin/pages/ProductsManagement";
+import { CategoriesManagement } from "@/modules/admin/pages/CategoriesManagement";
+import { RolesManagement } from "@/modules/admin/pages/RolesManagment";
 
 export const AppRoutes: React.FC = () => {
   return (

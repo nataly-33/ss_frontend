@@ -9,12 +9,17 @@ export const AdminRoute: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const isAdmin = user?.rol_detalle?.nombre === "Admin";
-  const isEmpleado = user?.rol_detalle?.nombre === "Empleado";
+  // Accept either the normalized `rol_detalle` (from serialized user) or the
+  // compact `rol` field (sometimes used elsewhere) to determine role.
+  const isAdmin =
+    user?.rol_detalle?.nombre === "Admin" || (user as any)?.rol?.nombre === "Admin";
+  const isEmpleado =
+    user?.rol_detalle?.nombre === "Empleado" || (user as any)?.rol?.nombre === "Empleado";
 
   if (!isAdmin && !isEmpleado) {
     return <Navigate to="/" replace />;
   }
 
+  // Authorized for admin area: render nested admin routes
   return <Outlet />;
 };
