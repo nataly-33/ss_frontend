@@ -44,7 +44,7 @@ npm run preview
 
 No agregues tu archivo `.env` en el repositorio. Usa `.env.example` como plantilla. Variables relevantes:
 
-- VITE_API_URL — URL base de la API (ej: http://localhost:8000/api)
+- VITE_API_URL — URL base de la API (ej: http://localhost:8000)
 - VITE_APP_NAME — Nombre de la app para mostrar
 
 Ejemplo:

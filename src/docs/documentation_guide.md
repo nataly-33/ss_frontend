@@ -1,6 +1,6 @@
 # 📚 Guía de Documentación Técnica - Frontend SmartSales365
 
-**Versión:** 1.0
+**Versión:** 2.3
 **Fecha:** 6 de Noviembre, 2025
 **Framework:** React 18 + TypeScript + Vite
 
@@ -11,14 +11,18 @@
 1. [Introducción](#introducción)
 2. [Arquitectura del Proyecto](#arquitectura-del-proyecto)
 3. [Estructura de Carpetas](#estructura-de-carpetas)
-4. [Tecnologías Utilizadas](#tecnologías-utilizadas)
-5. [Módulos del Sistema](#módulos-del-sistema)
-6. [Componentes Reutilizables](#componentes-reutilizables)
-7. [Servicios y API](#servicios-y-api)
-8. [Stores (Zustand)](#stores-zustand)
-9. [Rutas y Navegación](#rutas-y-navegación)
-10. [Sistema de Colores](#sistema-de-colores)
-11. [Autenticación y Autorización](#autenticación-y-autorización)
+4. [Mejores Prácticas Implementadas](#mejores-prácticas-implementadas)
+5. [Separación de Tipos e Interfaces](#separación-de-tipos-e-interfaces)
+6. [Configuración Centralizada](#configuración-centralizada)
+7. [Tecnologías Utilizadas](#tecnologías-utilizadas)
+8. **[Páginas del Sistema](#páginas-del-sistema)** ← **NUEVO**
+9. [Módulos del Sistema](#módulos-del-sistema)
+10. [Componentes Reutilizables](#componentes-reutilizables)
+11. [Servicios y API](#servicios-y-api)
+12. [Stores (Zustand)](#stores-zustand)
+13. [Rutas y Navegación](#rutas-y-navegación)
+14. [Sistema de Colores](#sistema-de-colores)
+15. [Autenticación y Autorización](#autenticación-y-autorización)
 
 ---
 
@@ -79,6 +83,269 @@ Response
 State Update (Store o useState)
     ↓
 Re-render del componente
+```
+
+---
+
+## ✨ Mejores Prácticas Implementadas
+
+### 1. Separación de Responsabilidades
+
+Cada módulo sigue una estructura clara y consistente:
+
+```
+modules/[module-name]/
+├── pages/           # Páginas/Vistas del módulo
+├── components/      # Componentes específicos del módulo
+├── services/        # Lógica de llamadas API
+└── types/          # Interfaces y tipos TypeScript
+```
+
+**Beneficios:**
+- ✅ Código más mantenible y escalable
+- ✅ Fácil de encontrar archivos relacionados
+- ✅ Evita archivos sobrecargados
+- ✅ Mejor colaboración en equipo
+
+### 2. Configuración Centralizada
+
+#### Endpoints (`src/core/config/endpoints.ts`)
+Todos los endpoints del backend en un solo lugar:
+
+```typescript
+export const ENDPOINTS = {
+  AUTH: {
+    LOGIN: '/api/auth/login/',
+    REGISTER: '/api/auth/register/',
+    ME: '/api/auth/me/',
+  },
+  PRODUCTS: {
+    BASE: '/api/products/',
+    BY_SLUG: (slug: string) => `/api/products/${slug}/`,
+  },
+  // ... más endpoints
+}
+```
+
+#### Rutas Frontend (`src/core/config/routes.ts`)
+Todas las rutas del frontend centralizadas:
+
+```typescript
+export const PUBLIC_ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  PRODUCTS: '/products',
+  PRODUCT_DETAIL: (slug: string) => `/products/${slug}`,
+}
+
+export const PRIVATE_ROUTES = {
+  PROFILE: '/profile',
+  ORDERS: '/orders',
+  CART: '/cart',
+}
+
+export const ADMIN_ROUTES = {
+  DASHBOARD: '/admin',
+  PRODUCTS: '/admin/products',
+  ORDERS: '/admin/orders',
+}
+```
+
+**Ventajas:**
+- ✅ Cambios en un solo lugar
+- ✅ Autocompletado TypeScript
+- ✅ Evita errores de typos
+- ✅ Fácil refactorización
+
+### 3. Sistema de Tipos Robusto
+
+Cada módulo define sus propios tipos en archivos separados:
+
+```typescript
+// modules/cart/types/index.ts
+export interface CartItem {
+  id: string;
+  prenda: {...};
+  talla: {...};
+  cantidad: number;
+  subtotal: number;
+}
+
+export interface AddToCartRequest {
+  prenda_id: string;
+  talla_id: string;
+  cantidad: number;
+}
+```
+
+**Beneficios:**
+- ✅ Type safety completo
+- ✅ Mejor documentación del código
+- ✅ Intellisense mejorado
+- ✅ Detección temprana de errores
+
+---
+
+## 📦 Separación de Tipos e Interfaces
+
+### Estructura por Módulo
+
+Cada módulo mantiene sus tipos separados de la lógica:
+
+```
+modules/[module]/
+├── types/
+│   └── index.ts        # Todas las interfaces y tipos
+├── services/
+│   └── [module].service.ts  # Importa tipos de ../types
+├── components/
+│   └── [Component].tsx       # Importa tipos de ../types
+└── pages/
+    └── [Page].tsx           # Importa tipos de ../types
+```
+
+### Ejemplo: Cart Module
+
+**types/index.ts:**
+```typescript
+export interface CartItem {
+  id: string;
+  prenda: {
+    id: string;
+    nombre: string;
+    slug: string;
+    precio: number;
+    imagen_principal?: string;
+  };
+  talla: {
+    id: string;
+    nombre: string;
+  };
+  cantidad: number;
+  subtotal: number;
+}
+
+export interface Cart {
+  id: string;
+  usuario: string;
+  items: CartItem[];
+  total: number;
+  cantidad_items: number;
+}
+
+export interface AddToCartRequest {
+  prenda_id: string;
+  talla_id: string;
+  cantidad: number;
+}
+
+export interface UpdateCartItemRequest {
+  cantidad: number;
+}
+```
+
+**services/cart.service.ts:**
+```typescript
+import api from "@core/config/api.config";
+import { ENDPOINTS } from "@/core/config/endpoints";
+import type { Cart, AddToCartRequest, UpdateCartItemRequest } from "../types";
+
+export const cartService = {
+  async getCart(): Promise<Cart> {
+    const response = await api.get<Cart>(ENDPOINTS.CART.BASE);
+    return response.data;
+  },
+  
+  async addItem(data: AddToCartRequest): Promise<Cart> {
+    const response = await api.post<Cart>(ENDPOINTS.CART.ADD_ITEM, data);
+    return response.data;
+  },
+  // ... más métodos
+}
+```
+
+### Ventajas de Esta Separación
+
+1. **Reutilización:** Los tipos pueden ser importados por múltiples archivos
+2. **Mantenibilidad:** Cambios en tipos se reflejan automáticamente en todos los usos
+3. **Claridad:** Es fácil ver qué datos maneja cada módulo
+4. **Type Safety:** TypeScript valida todos los usos de los tipos
+
+---
+
+## 🔧 Configuración Centralizada
+
+### Endpoints del Backend
+
+Archivo: `src/core/config/endpoints.ts`
+
+```typescript
+const API_BASE = '/api';
+
+export const ENDPOINTS = {
+  // Auth endpoints
+  AUTH: {
+    LOGIN: `${API_BASE}/auth/login/`,
+    LOGOUT: `${API_BASE}/auth/logout/`,
+    REFRESH: `${API_BASE}/auth/token/refresh/`,
+    REGISTER: `${API_BASE}/auth/register/`,
+    ME: `${API_BASE}/auth/me/`,
+  },
+
+  // Products endpoints
+  PRODUCTS: {
+    BASE: `${API_BASE}/products/`,
+    BY_SLUG: (slug: string) => `${API_BASE}/products/${slug}/`,
+    CATEGORIES: `${API_BASE}/products/categorias/`,
+    BRANDS: `${API_BASE}/products/marcas/`,
+    SEARCH: `${API_BASE}/products/search/`,
+  },
+
+  // Cart endpoints
+  CART: {
+    BASE: `${API_BASE}/cart/`,
+    ADD_ITEM: `${API_BASE}/cart/add/`,
+    UPDATE_ITEM: (itemId: string) => `${API_BASE}/cart/items/${itemId}/`,
+    REMOVE_ITEM: (itemId: string) => `${API_BASE}/cart/items/${itemId}/`,
+    CLEAR: `${API_BASE}/cart/clear/`,
+  },
+
+  // Orders endpoints
+  ORDERS: {
+    BASE: `${API_BASE}/orders/`,
+    BY_ID: (orderId: string) => `${API_BASE}/orders/${orderId}/`,
+    MY_ORDERS: `${API_BASE}/orders/my-orders/`,
+    CREATE: `${API_BASE}/orders/create/`,
+    UPDATE_STATUS: (orderId: string) => `${API_BASE}/orders/${orderId}/update-status/`,
+    CANCEL: (orderId: string) => `${API_BASE}/orders/${orderId}/cancel/`,
+  },
+
+  // Customers endpoints
+  CUSTOMERS: {
+    PROFILE: `${API_BASE}/customers/profile/`,
+    UPDATE_PROFILE: `${API_BASE}/customers/profile/update/`,
+    ADDRESSES: `${API_BASE}/customers/addresses/`,
+    ADDRESS_BY_ID: (addressId: string) => `${API_BASE}/customers/addresses/${addressId}/`,
+    FAVORITES: `${API_BASE}/customers/favorites/`,
+    ADD_FAVORITE: `${API_BASE}/customers/favorites/add/`,
+    REMOVE_FAVORITE: (productId: string) => `${API_BASE}/customers/favorites/${productId}/`,
+  },
+}
+```
+
+### Uso en Servicios
+
+```typescript
+// ✅ CORRECTO
+import { ENDPOINTS } from '@/core/config/endpoints';
+
+const response = await api.get(ENDPOINTS.PRODUCTS.BASE);
+const product = await api.get(ENDPOINTS.PRODUCTS.BY_SLUG('vestido-rojo'));
+
+// ❌ INCORRECTO (hardcoded)
+const response = await api.get('/api/products/');
+const product = await api.get(`/api/products/${slug}/`);
 ```
 
 ---
@@ -198,7 +465,519 @@ ss_frontend/
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## � Páginas del Sistema
+
+Esta sección documenta TODAS las páginas del sistema, qué componentes usa cada una, sus servicios, y su funcionalidad.
+
+---
+
+### 🔐 Módulo: Auth
+
+#### **LoginPage** (`/login`)
+**Archivo:** `src/modules/auth/pages/NewLoginPage.tsx`
+
+**Propósito:** Autenticar usuarios y redirigir según su rol.
+
+**Componentes usados:**
+- `Button` (shared/ui) - Botón de submit con loading state
+- `Input` (shared/ui) - Campos de email y password
+
+**Servicios:**
+- `authService.login()` - Autenticación con email/password
+
+**Estado:**
+- `useState` para email, password, errors, isLoading
+- `useAuthStore` para guardar usuario y tokens
+
+**Flujo:**
+1. Usuario ingresa email y password
+2. Se valida formato de email
+3. Se llama a `authService.login()`
+4. Si es exitoso, guarda tokens en localStorage y usuario en Zustand
+5. Redirige a `/admin` (si es admin) o `/` (si es cliente)
+6. Si falla, muestra errores del backend
+
+**Features:**
+- Toggle password visibility (Eye icon)
+- Validación de email con regex
+- Loading state en botón
+- Mensajes de error específicos
+- Link a RegisterPage
+
+---
+
+#### **RegisterPage** (`/register`)
+**Archivo:** `src/modules/auth/pages/NewRegisterPage.tsx`
+
+**Propósito:** Registro de nuevos usuarios.
+
+**Componentes usados:**
+- `Button` (shared/ui)
+- `Input` (shared/ui)
+- `CheckCircle` (lucide-react) - Icono de éxito
+
+**Servicios:**
+- `authService.register()` - Registro de usuario nuevo
+
+**Estado:**
+- `useState` para form data (nombre, apellido, email, telefono, password, confirmPassword, acceptTerms)
+- `useState` para validation errors
+- `useState` para showPassword y showConfirmPassword
+- `useState` para isRegistering y isSuccess
+
+**Flujo:**
+1. Usuario llena formulario de registro
+2. Validación client-side:
+   - Email válido (regex)
+   - Password mínimo 8 caracteres
+   - Passwords coinciden
+   - Términos aceptados
+3. Llama a `authService.register()`
+4. Si exitoso, muestra pantalla de éxito con CheckCircle
+5. Auto-redirect a /login después de 3 segundos
+6. Si falla, muestra errores del backend
+
+**Features:**
+- Grid de dos columnas para campos
+- Password visibility toggles
+- Validación completa en client-side
+- Success screen con animación
+- Checkbox de términos y condiciones
+- Auto-redirect después de registro exitoso
+
+---
+
+### 🛒 Módulo: Cart
+
+#### **CartPage** (`/cart`)
+**Archivo:** `src/modules/cart/pages/NewCartPage.tsx`
+
+**Propósito:** Ver y gestionar items del carrito de compras.
+
+**Componentes usados:**
+- `CartItem` (cart/components) - Item individual con imagen, talla, cantidad, precio
+- `CartSummary` (cart/components) - Resumen de subtotal, envío, total
+- `EmptyCart` (cart/components) - Estado vacío con CTA
+- `LoadingSpinner` (shared/ui)
+- `Button` (shared/ui)
+
+**Servicios:**
+- `cartService.getCart()` - Obtener carrito actual
+- `cartService.updateItem()` - Actualizar cantidad
+- `cartService.removeItem()` - Eliminar item
+
+**Estado:**
+- `useState` para cart (Cart | null)
+- `useState` para isLoading
+
+**Flujo:**
+1. Al montar, carga carrito con `cartService.getCart()`
+2. Muestra lista de CartItem
+3. Usuario puede:
+   - Cambiar cantidad (llama a updateItem)
+   - Eliminar item (llama a removeItem)
+   - Proceder al checkout (navega a /checkout)
+4. CartSummary muestra totales en sidebar
+5. Si carrito vacío, muestra EmptyCart con botón a /products
+
+**Features:**
+- Grid responsivo (items a la izquierda, summary a la derecha)
+- Loading state
+- Empty state
+- Actualización optimista de cantidad
+- Confirmación antes de eliminar
+- Cálculo automático de totales
+
+---
+
+### 💳 Módulo: Checkout
+
+#### **CheckoutPage** (`/checkout`)
+**Archivo:** `src/modules/checkout/pages/NewCheckoutPage.tsx`
+
+**Propósito:** Completar proceso de compra seleccionando dirección, pago y confirmando.
+
+**Componentes usados:**
+- `AddressSelector` (checkout/components) - Selección de dirección de envío
+- `PaymentSelector` (checkout/components) - Selección de método de pago
+- `OrderSummary` (checkout/components) - Resumen y confirmación
+- `LoadingSpinner` (shared/ui)
+
+**Servicios:**
+- `cartService.getCart()` - Obtener carrito
+- `customersService.getAddresses()` - Obtener direcciones del usuario
+- `ordersService.getPaymentMethods()` - Obtener métodos de pago disponibles
+- `ordersService.createOrder()` - Crear orden
+- `cartService.clearCart()` - Limpiar carrito después de orden exitosa
+
+**Estado:**
+- `useState` para cart, addresses, paymentMethods
+- `useState` para selectedAddressId, selectedPaymentMethodId
+- `useState` para notes (notas del pedido)
+- `useState` para isLoading, isProcessing
+- `useAuthStore` para obtener usuario
+
+**Flujo:**
+1. Al montar, carga en paralelo (Promise.all): cart, addresses, paymentMethods
+2. Auto-selecciona dirección principal y primer método de pago activo
+3. Usuario selecciona dirección de envío
+4. Usuario selecciona método de pago
+5. Usuario puede agregar notas opcionales
+6. OrderSummary valida que address y payment estén seleccionados
+7. Al confirmar, llama a `ordersService.createOrder()`
+8. Si exitoso, limpia carrito y navega a `/orders/{orderId}`
+9. Si falla, muestra error
+
+**Features:**
+- Carga de datos en paralelo
+- Auto-selección de dirección principal
+- Validación antes de confirmar
+- Botón "Agregar nueva dirección" (placeholder)
+- Grid de 3 columnas (address + payment | summary)
+- Redirect si carrito está vacío
+- Processing state durante creación de orden
+
+---
+
+### 👤 Módulo: Customers
+
+#### **ProfilePage** (`/profile`)
+**Archivo:** `src/modules/customers/pages/NewProfilePage.tsx`
+
+**Propósito:** Gestionar perfil del usuario, direcciones y seguridad.
+
+**Componentes usados:**
+- `ProfileForm` (customers/components) - Edición de datos personales
+- `AddressList` (customers/components) - Lista de direcciones guardadas
+- `AddressForm` (customers/components) - Modal para crear/editar dirección
+- `SecuritySettings` (customers/components) - Cambio de contraseña
+- `LoadingSpinner` (shared/ui)
+- `Button` (shared/ui)
+
+**Servicios:**
+- `customersService.getProfile()` - Obtener perfil del usuario
+- `customersService.getAddresses()` - Obtener direcciones
+- `customersService.updateProfile()` - Actualizar perfil
+- `customersService.createAddress()` - Crear dirección
+- `customersService.updateAddress()` - Actualizar dirección
+- `customersService.deleteAddress()` - Eliminar dirección
+
+**Estado:**
+- `useState` para activeTab ("profile" | "addresses" | "security")
+- `useState` para profile, addresses
+- `useState` para isLoading
+- `useState` para isAddressFormOpen, selectedAddress
+
+**Flujo:**
+1. Al montar, carga profile y addresses en paralelo
+2. Muestra tabs horizontales: Datos Personales, Mis Direcciones, Seguridad
+3. **Tab Datos Personales:**
+   - Muestra ProfileForm
+   - Campos de solo lectura: nombre, apellido, email (requieren soporte)
+   - Campos editables: teléfono, fecha nacimiento, género
+   - Muestra saldo de billetera
+   - Botón "Editar" habilita campos
+   - "Guardar" actualiza profile
+4. **Tab Mis Direcciones:**
+   - Muestra AddressList con grid de tarjetas
+   - Badge de "Principal" en dirección principal
+   - Botones: "Hacer principal", "Editar", "Eliminar"
+   - Botón "Nueva dirección" abre AddressForm modal
+5. **Tab Seguridad:**
+   - Muestra SecuritySettings
+   - Form para cambiar contraseña (actual, nueva, confirmar)
+   - Validación de contraseña (min 8 chars, coincidencia)
+   - Mensaje de éxito al cambiar
+
+**Features:**
+- Sistema de tabs con íconos (User, MapPin, Shield)
+- Edición inline en ProfileForm
+- CRUD completo de direcciones
+- Modal para crear/editar dirección
+- Validación de contraseña robusta
+- Confirmación antes de eliminar dirección
+- Saldo de billetera con botón "Recargar" (placeholder)
+
+---
+
+### 📦 Módulo: Orders
+
+#### **OrdersPage** (`/orders`)
+**Archivo:** `src/modules/orders/pages/NewOrdersPage.tsx`
+
+**Propósito:** Listar todos los pedidos del usuario con filtros.
+
+**Componentes usados:**
+- `OrderCard` (orders/components) - Tarjeta de pedido individual
+- `OrderFilter` (orders/components) - Panel de filtros
+- `LoadingSpinner` (shared/ui)
+
+**Servicios:**
+- `ordersService.getMyOrders()` - Obtener pedidos del usuario
+
+**Estado:**
+- `useState` para orders (Order[])
+- `useState` para filteredOrders (Order[])
+- `useState` para isLoading
+- `useState` para filters (estado, fechaDesde, fechaHasta)
+
+**Flujo:**
+1. Al montar, carga pedidos con `getMyOrders()`
+2. Muestra grid de OrderCard
+3. OrderFilter permite filtrar por:
+   - Estado (pendiente, procesando, enviado, entregado, cancelado)
+   - Fecha desde
+   - Fecha hasta
+4. Filtros se aplican en tiempo real
+5. Muestra contador de filtros activos
+6. Cada OrderCard muestra:
+   - Número de pedido
+   - Fecha
+   - Estado con badge coloreado
+   - Preview de items (primeros 2)
+   - Total
+   - Botón "Ver detalles" → navega a `/orders/{id}`
+7. Si no hay pedidos, muestra empty state
+
+**Features:**
+- Grid responsivo (1 col móvil, 2 col tablet, 3 col desktop)
+- Filtros con panel flotante
+- Badges de estado con colores diferenciados
+- Contador de resultados filtrados
+- Empty state diferenciado (sin pedidos vs sin resultados)
+- Botón "Limpiar filtros"
+
+---
+
+#### **OrderDetailPage** (`/orders/:id`)
+**Archivo:** `src/modules/orders/pages/NewOrderDetailPage.tsx`
+
+**Propósito:** Ver detalles completos de un pedido específico.
+
+**Componentes usados:**
+- `OrderDetail` (orders/components) - Detalles del pedido
+- `OrderTimeline` (orders/components) - Timeline de estados
+- `LoadingSpinner` (shared/ui)
+- `Button` (shared/ui)
+
+**Servicios:**
+- `ordersService.getOrder(id)` - Obtener pedido por ID
+- `ordersService.cancelOrder(id)` - Cancelar pedido
+
+**Estado:**
+- `useState` para order (Order | null)
+- `useState` para isLoading, isCancelling
+- `useParams` para obtener id de la URL
+
+**Flujo:**
+1. Al montar, extrae id de params y carga pedido
+2. Muestra botón "Volver a mis pedidos"
+3. Si pedido está en "pendiente" o "procesando", muestra botón "Cancelar pedido"
+4. Layout de 2 columnas:
+   - **Columna izquierda (OrderDetail):**
+     - Header con número y total
+     - Items del pedido (imagen, nombre, talla, cantidad, precios)
+     - Totales (subtotal, total)
+     - Dirección de envío completa
+     - Método de pago
+     - Información del cliente (nombre, email)
+   - **Columna derecha (OrderTimeline):**
+     - Timeline visual con 4 pasos: Pedido recibido → Procesando → Enviado → Entregado
+     - Paso actual animado (pulse)
+     - Checkmarks en pasos completados
+     - Si está "enviado", muestra mensaje de entrega estimada (3-5 días)
+     - Si está "cancelado", muestra estado especial con emoji ❌
+5. Botón "Cancelar pedido" con confirmación
+
+**Features:**
+- Timeline animado con iconos (CheckCircle, Package, Truck, Home)
+- Línea de progreso vertical
+- Estado especial para pedidos cancelados
+- Botón de cancelación condicional
+- Grid de items con imágenes
+- Información completa de dirección y pago
+- Navegación de regreso
+
+---
+
+### 🏠 Módulo: Products
+
+#### **HomePage** (`/`)
+**Archivo:** `src/modules/products/pages/HomePage.tsx`
+
+**Propósito:** Página principal con hero carousel, productos destacados y novedades.
+
+**Componentes usados:**
+- `HeroCarousel` (products/components) - Carousel de imágenes principales
+- `ProductCard` (products/components) - Tarjeta de producto
+- `Button` (shared/ui)
+
+**Servicios:**
+- `productsService.getProducts()` - Obtener productos con filtros
+
+**Estado:**
+- `useState` para featuredProducts, newArrivals
+- `useState` para isLoading
+
+**Flujo:**
+1. Muestra HeroCarousel en la parte superior
+2. Carga productos destacados (filtro: destacado=true)
+3. Carga novedades (filtro: ordenado por fecha desc, limit 8)
+4. Muestra grid de ProductCard para cada sección
+5. Botones "Ver todo el catálogo" navegan a /products
+
+**Features:**
+- Hero carousel con slides automáticos
+- Secciones de "Productos Destacados" y "Recién Llegados"
+- Grid responsivo de ProductCard
+- Sombras 3D en ProductCard
+- Hover effects con elevación
+
+---
+
+#### **ProductsPage** (`/products`)
+**Archivo:** `src/modules/products/pages/ProductsPage.tsx`
+
+**Propósito:** Catálogo completo con filtros y paginación.
+
+**Componentes usados:**
+- `ProductCard` (products/components)
+- `ProductFilters` (products/components) - Filtros de categoría, talla, precio
+- `LoadingSpinner` (shared/ui)
+
+**Servicios:**
+- `productsService.getProducts()` - Con filtros de categoría, talla, precio_min, precio_max, ordering
+- `productsService.getCategories()` - Para filtro de categorías
+
+**Estado:**
+- `useState` para products, categories
+- `useState` para filters (categoria, talla, precio_min, precio_max, ordering)
+- `useState` para isLoading, currentPage
+
+**Flujo:**
+1. Carga categorías para filtros
+2. Carga productos con filtros aplicados
+3. ProductFilters permite seleccionar:
+   - Categoría
+   - Talla
+   - Rango de precio
+   - Ordenamiento (precio asc/desc, nombre, recientes)
+4. Al cambiar filtros, recarga productos
+5. Grid de ProductCard con productos
+6. Paginación si hay más de X productos
+
+**Features:**
+- Filtros en sidebar (desktop) o modal (móvil)
+- Grid responsivo de productos
+- Paginación
+- Ordenamiento múltiple
+- Loading states
+- Empty state si no hay resultados
+
+---
+
+#### **ProductDetailPage** (`/products/:slug`)
+**Archivo:** `src/modules/products/pages/ProductDetailPage.tsx`
+
+**Propósito:** Ver detalles completos de un producto y agregar al carrito.
+
+**Componentes usados:**
+- `Button` (shared/ui)
+- `Modal` (shared/ui) - Para selector de talla
+- `Heart` icon (lucide-react) - Favoritos
+
+**Servicios:**
+- `productsService.getProductBySlug(slug)` - Obtener producto por slug
+- `cartService.addItem()` - Agregar al carrito (**pendiente por fix de backend**)
+
+**Estado:**
+- `useState` para product
+- `useState` para selectedSize
+- `useState` para quantity
+- `useState` para isLoading, isAddingToCart
+- `useParams` para slug
+
+**Flujo:**
+1. Extrae slug de params
+2. Carga producto con `getProductBySlug(slug)`
+3. Muestra galería de imágenes (principal + thumbnails)
+4. Información del producto: nombre, precio, descripción, categoría
+5. Selector de talla (dropdown)
+6. Selector de cantidad (input number)
+7. Botón "Agregar al carrito" (disabled si no hay talla seleccionada)
+8. Botón de favoritos (corazón)
+9. Tabs con: Descripción, Cuidados, Envío
+10. Sección de "Productos relacionados" (misma categoría)
+
+**Features:**
+- Galería de imágenes con zoom
+- Selector de talla con stock disponible
+- Contador de cantidad
+- Validación de stock
+- Tabs de información
+- Productos relacionados
+- Botón de favoritos
+- **Nota:** Funcionalidad de "Agregar al carrito" comentada hasta que backend devuelva tallas como array
+
+---
+
+### 🛡️ Módulo: Admin (Dashboard)
+
+#### **AdminDashboard** (`/admin`)
+**Archivo:** `src/modules/admin/pages/AdminDashboard.tsx`
+
+**Propósito:** Dashboard principal para administradores con estadísticas.
+
+**Features:**
+- Estadísticas de ventas
+- Gráficos de productos más vendidos
+- Lista de pedidos recientes
+- Resumen de inventario
+
+---
+
+#### **UsersManagement** (`/admin/users`)
+**Archivo:** `src/modules/admin/pages/UsersManagment.tsx`
+
+**Propósito:** Gestionar usuarios del sistema (CRUD).
+
+**Features:**
+- Tabla de usuarios
+- Crear, editar, eliminar usuarios
+- Asignar roles
+- Búsqueda y filtros
+
+---
+
+#### **ProductsManagement** (`/admin/products`)
+**Archivo:** `src/modules/admin/pages/ProductsManagement.tsx`
+
+**Propósito:** Gestionar productos (CRUD).
+
+**Features:**
+- Tabla de productos
+- Crear, editar, eliminar productos
+- Subir imágenes
+- Gestionar stock y precios
+- Asignar categorías
+
+---
+
+#### **CategoriesManagement** (`/admin/categories`)
+**Archivo:** `src/modules/admin/pages/CategoriesManagement.tsx`
+
+**Propósito:** Gestionar categorías de productos.
+
+---
+
+#### **RolesManagement** (`/admin/roles`)
+**Archivo:** `src/modules/admin/pages/RolesManagment.tsx`
+
+**Propósito:** Gestionar roles y permisos (RBAC).
+
+---
+
+## �🛠️ Tecnologías Utilizadas
 
 ### Core
 

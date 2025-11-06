@@ -1,981 +1,936 @@
-# 🧪 Guía de Testing - SmartSales365 Frontend
+# 🧪 Guía de Testing Manual - SmartSales Frontend
 
-**Cómo Probar Todas las Funcionalidades del Sistema**
-
-**Versión:** 1.0
+**Versión:** 2.3
 **Fecha:** 6 de Noviembre, 2025
+**Actualizado:** Con RegisterPage, CheckoutPage, ProfilePage, OrdersPage refactorizados
 
 ---
 
 ## 📋 Tabla de Contenidos
 
 1. [Introducción](#introducción)
-2. [Pre-requisitos](#pre-requisitos)
-3. [Flujo de Prueba - Cliente](#flujo-de-prueba-cliente)
-4. [Flujo de Prueba - Administrador](#flujo-de-prueba-administrador)
-5. [Flujo de Prueba - Empleado](#flujo-de-prueba-empleado)
-6. [Casos de Prueba por Módulo](#casos-de-prueba-por-módulo)
-7. [Errores Comunes y Soluciones](#errores-comunes-y-soluciones)
+2. [Preparación del Entorno](#preparación-del-entorno)
+3. [Casos de Prueba por Módulo](#casos-de-prueba-por-módulo)
+4. [Flujos End-to-End](#flujos-end-to-end)
+5. [Checklist de Validación](#checklist-de-validación)
 
 ---
 
 ## 🎯 Introducción
 
-Esta guía te ayudará a probar **paso a paso** todas las funcionalidades del sistema SmartSales365, simulando los flujos reales de usuarios.
+Esta guía proporciona instrucciones paso a paso para probar TODAS las funcionalidades del frontend de SmartSales contra el backend en Django.
 
-### Objetivos de Testing
+### Objetivo
 
-- ✅ Verificar que cada funcionalidad trabaja correctamente
-- ✅ Validar flujos completos de usuario (E2E)
-- ✅ Identificar bugs antes de producción
-- ✅ Comprobar la experiencia de usuario
+Verificar que:
+- ✅ Todas las páginas cargan correctamente
+- ✅ Los servicios se conectan al backend
+- ✅ La autenticación funciona (JWT)
+- ✅ Los flujos de usuario son intuitivos
+- ✅ No hay errores en consola
+- ✅ El diseño es responsivo
 
 ---
 
-## 🔧 Pre-requisitos
+## 🛠️ Preparación del Entorno
 
-### 1. Backend Corriendo
+### 1. Levantar el Backend
 
 ```bash
 cd ss_backend
 python manage.py runserver
 ```
 
-**Verificar**: http://localhost:8000/api/docs/ debe cargar Swagger
+**Verificar:** Backend corriendo en `http://localhost:8000`
 
-### 2. Frontend Corriendo
+### 2. Levantar el Frontend
 
 ```bash
 cd ss_frontend
 npm run dev
 ```
 
-**Verificar**: http://localhost:5173/ debe cargar la página principal
+**Verificar:** Frontend corriendo en `http://localhost:5173`
 
-### 3. Base de Datos con Datos de Prueba
+### 3. Crear Datos de Prueba (Si es necesario)
 
 ```bash
 cd ss_backend
-python manage.py shell < scripts/seed_data.py
+python scripts/seed_data.py
 ```
 
-**Esto crea**:
-- Usuarios de prueba
-- Categorías (Vestidos, Blusas, Pantalones, Faldas)
-- Marcas (Zara, H&M, Mango, Forever 21, Shein)
-- Productos con stock
+Esto creará:
+- 2 usuarios: admin (admin@test.com) y cliente (cliente@test.com)
+- Productos de ejemplo
+- Categorías
 - Métodos de pago
 
----
-
-## 👥 Flujo de Prueba - Cliente
-
-### Escenario: Usuario nuevo que quiere comprar ropa
-
-#### Paso 1: Registro
-
-1. Abre el navegador en `http://localhost:5173/`
-2. Click en **"Iniciar Sesión"** en el navbar
-3. Click en **"¿No tienes cuenta? Regístrate"**
-4. Llena el formulario:
-   ```
-   Nombre: María
-   Apellido: García
-   Email: maria.garcia@test.com
-   Teléfono: +59175123456
-   Password: TestPassword123!
-   Confirmar Password: TestPassword123!
-   ```
-5. Click en **"Registrarse"**
-
-**✅ Resultado Esperado:**
-- Redirección a la página de login
-- Mensaje de éxito "Usuario registrado correctamente"
-
-**❌ Si falla:**
-- Verifica que el email no esté ya registrado
-- Revisa que el backend esté corriendo
-
----
-
-#### Paso 2: Login
-
-1. En la página de login (`/login`), ingresa:
-   ```
-   Email: maria.garcia@test.com
-   Password: TestPassword123!
-   ```
-2. Click en **"Iniciar Sesión"**
-
-**✅ Resultado Esperado:**
-- Redirección a la página principal (`/`)
-- En el navbar, aparece el nombre del usuario y el icono de carrito
-- El botón de "Iniciar Sesión" cambia a menú de perfil
-
-**⚠️ Problema Conocido:**
-- Actualmente SIEMPRE redirige a `/` sin importar el rol
-- Debería verificar el rol y redirigir según corresponda
-
----
-
-#### Paso 3: Navegar por el Catálogo
-
-1. En la página principal, verás:
-   - Hero carousel (banner principal)
-   - Grid de categorías con imágenes
-   - Productos destacados
-   - Productos nuevos
-
-2. Click en una categoría (ej: "Vestidos")
-
-**✅ Resultado Esperado:**
-- Redirección a `/products?categoria={id}`
-- Lista filtrada de productos de esa categoría
-- Filtros laterales visibles
-
----
-
-#### Paso 4: Buscar Productos
-
-1. En `/products`, usa la barra de búsqueda
-2. Escribe "floral"
-3. Los productos se filtran automáticamente
-
-**✅ Resultado Esperado:**
-- Solo aparecen productos con "floral" en nombre o descripción
-- La URL cambia a `/products?search=floral`
-
----
-
-#### Paso 5: Aplicar Filtros
-
-1. Selecciona una marca del filtro (ej: "Zara")
-2. Ajusta el rango de precio (ej: 100-500)
-
-**✅ Resultado Esperado:**
-- Productos filtrados por marca y precio
-- URL actualizada con query params
-
----
-
-#### Paso 6: Ver Detalle de Producto
-
-1. Click en un producto del grid
-2. Deberías ver:
-   - Galería de imágenes (si tiene múltiples)
-   - Nombre del producto
-   - Precio
-   - Descripción completa
-   - Marca
-   - Categorías
-   - Selector de talla
-   - Selector de cantidad
-   - Stock disponible por talla
-   - Botón "Agregar al Carrito"
-
-**✅ Resultado Esperado:**
-- Todos los datos se cargan correctamente
-- El selector de talla muestra las tallas disponibles
-- Al seleccionar una talla, se muestra el stock de esa talla
-
----
-
-#### Paso 7: Agregar al Carrito
-
-1. Selecciona una talla (ej: "M")
-2. Ajusta la cantidad (ej: 2)
-3. Click en **"Agregar al Carrito"**
-
-**✅ Resultado Esperado:**
-- Mensaje de éxito "Producto agregado al carrito"
-- El contador del icono de carrito en el navbar se actualiza
-- Puedes quedarte en la misma página o ir al carrito
-
-**❌ Si falla:**
-- Verifica que estés autenticado (el carrito requiere login)
-- Revisa que haya stock suficiente de esa talla
-
----
-
-#### Paso 8: Ver Carrito
-
-1. Click en el icono de carrito en el navbar
-2. O navega a `/cart`
-
-**✅ Resultado Esperado:**
-- Lista de productos agregados con:
-  - Imagen del producto
-  - Nombre
-  - Talla seleccionada
-  - Precio unitario
-  - Cantidad (con botones +/-)
-  - Subtotal
-  - Botón "Eliminar"
-- Resumen del pedido:
-  - Subtotal
-  - Envío (gratis)
-  - Total
-- Botón "Proceder al Checkout"
-
-**⚠️ Estado Actual:**
-- La página CartPage tiene estructura HTML pero **NO funciona**
-- Necesita conectarse con `cart.service.ts`
-
----
-
-#### Paso 9: Modificar Carrito
-
-1. Incrementa la cantidad de un producto con el botón "+"
-2. Click en "Eliminar" en otro producto
-
-**✅ Resultado Esperado:**
-- Al incrementar: cantidad se actualiza, subtotal y total se recalculan
-- Al eliminar: el item desaparece del carrito, total se recalcula
-
----
-
-#### Paso 10: Proceder al Checkout
-
-1. Click en **"Proceder al Checkout"**
-2. Deberías ser redirigido a `/checkout`
-
-**✅ Resultado Esperado (cuando esté implementado):**
-- Paso 1: Seleccionar dirección de envío
-  - Si no tienes direcciones, formulario para crear una
-  - Si tienes, lista de direcciones con radio buttons
-- Paso 2: Seleccionar método de pago
-  - Efectivo
-  - PayPal
-  - (Stripe si está activo)
-- Paso 3: Resumen del pedido
-  - Productos
-  - Dirección seleccionada
-  - Método de pago
-  - Total
-  - Campo de notas opcionales
-- Botón "Confirmar Pedido"
-
-**⚠️ Estado Actual:**
-- CheckoutPage tiene estructura básica pero **NO está completamente implementado**
-
----
-
-#### Paso 11: Confirmar Pedido
-
-1. Completa todos los pasos del checkout
-2. Click en **"Confirmar Pedido"**
-
-**✅ Resultado Esperado:**
-- El pedido se crea en el backend
-- El stock se reduce automáticamente
-- El carrito se vacía
-- Redirección a `/orders/{id}` (detalle del pedido)
-- Si el método es PayPal, se abre ventana de PayPal
-
----
-
-#### Paso 12: Ver Mis Pedidos
-
-1. Navega a `/orders` (o click en "Mis Pedidos" en el navbar)
-
-**✅ Resultado Esperado:**
-- Lista de todos tus pedidos con:
-  - Número de pedido
-  - Fecha
-  - Estado (Pendiente, Confirmado, Enviado, etc.)
-  - Total
-  - Botón "Ver Detalle"
-
-**⚠️ Estado Actual:**
-- OrdersPage tiene estructura pero **NO está conectado** con el backend
-
----
-
-#### Paso 13: Ver Detalle de Pedido
-
-1. Click en un pedido de la lista
-
-**✅ Resultado Esperado:**
-- Información completa del pedido:
-  - Número de pedido
-  - Fecha
-  - Estado actual
-  - Productos incluidos (nombre, cantidad, precio)
-  - Dirección de envío
-  - Método de pago
-  - Subtotal, envío, total
-  - Historial de cambios de estado
-  - Botón "Cancelar Pedido" (si el estado lo permite)
-
----
-
-#### Paso 14: Gestionar Perfil
-
-1. Click en tu nombre en el navbar
-2. Click en **"Mi Perfil"**
-3. Navega a `/profile`
-
-**✅ Resultado Esperado (cuando esté implementado):**
-- **Tab "Datos Personales"**:
-  - Nombre, Apellido, Email, Teléfono
-  - Foto de perfil (opcional)
-  - Botón "Editar"
-- **Tab "Mis Direcciones"**:
-  - Lista de direcciones guardadas
-  - Indicador de dirección principal
-  - Botones: Editar, Eliminar, Marcar como principal
-  - Botón "Agregar Nueva Dirección"
-- **Tab "Seguridad"** (opcional):
-  - Cambiar contraseña
-
-**⚠️ Estado Actual:**
-- ProfilePage **NO está implementado**
-
----
-
-#### Paso 15: Gestionar Favoritos
-
-1. En la página de un producto, click en icono de corazón
-2. El producto se agrega a favoritos
-3. Navega a `/favorites`
-
-**✅ Resultado Esperado (cuando esté implementado):**
-- Grid de todos tus productos favoritos
-- Botón "Eliminar de favoritos" en cada card
-- Botón "Agregar al carrito" directo desde favoritos
-
-**⚠️ Estado Actual:**
-- FavoritesPage **NO está implementado**
-- El botón de favoritos en ProductDetailPage podría no funcionar
-
----
-
-#### Paso 16: Logout
-
-1. Click en tu nombre en el navbar
-2. Click en **"Cerrar Sesión"**
-
-**✅ Resultado Esperado:**
-- Se limpia el localStorage (tokens)
-- Se limpia el store de autenticación
-- Redirección a la página principal
-- El navbar muestra "Iniciar Sesión" nuevamente
-
----
-
-## 👨‍💼 Flujo de Prueba - Administrador
-
-### Escenario: Admin gestiona el sistema completo
-
-#### Paso 1: Login como Admin
-
-1. Navega a `/login`
-2. Ingresa credenciales de admin:
-   ```
-   Email: admin@smartsales365.com
-   Password: Admin2024!
-   ```
-3. Click en **"Iniciar Sesión"**
-
-**✅ Resultado Esperado:**
-- Login exitoso
-- **DEBERÍA** redirigir a `/admin` (dashboard)
-- **ACTUALMENTE** redirige a `/` (bug conocido)
-
-**Solución temporal:**
-- Navega manualmente a `/admin`
-
----
-
-#### Paso 2: Dashboard Administrativo
-
-1. En `/admin`, deberías ver:
-   - Sidebar con menú de navegación:
-     - Dashboard (estadísticas) ❌ Pendiente
-     - Usuarios ✅
-     - Productos ✅
-     - Categorías ✅
-     - Marcas ❌ Pendiente
-     - Roles ✅
-     - Pedidos ❌ Pendiente
-     - Reportes ❌ Pendiente
-   - Área de contenido (Outlet)
-
-**⚠️ Problema:**
-- El item "Dashboard" redirige a `/admin/users` (no hay overview)
-
----
-
-#### Paso 3: Gestión de Usuarios
-
-1. Click en **"Usuarios"** en el sidebar
-2. Deberías ver:
-   - Tabla con todos los usuarios
-   - Columnas: Nombre, Email, Rol, Estado (Activo/Inactivo)
-   - Barra de búsqueda
-   - Filtro por rol
-   - Botón "Crear Usuario"
-   - Botones de acción: Editar, Eliminar
-
-**Pruebas:**
-
-##### A. Buscar Usuario
-1. Escribe "maria" en la búsqueda
-2. La tabla se filtra en tiempo real
-
-**✅ Resultado:** Solo aparecen usuarios con "maria" en nombre o email
-
-##### B. Filtrar por Rol
-1. Selecciona "Cliente" en el filtro
-2. Solo aparecen usuarios con rol Cliente
-
-##### C. Crear Usuario
-1. Click en **"Crear Usuario"**
-2. Llena el formulario:
-   ```
-   Nombre: Carlos
-   Apellido: López
-   Email: carlos.lopez@test.com
-   Password: TestPass123!
-   Rol: Empleado
-   ```
-3. Click en **"Guardar"**
-
-**✅ Resultado:** Usuario creado, aparece en la tabla
-
-##### D. Editar Usuario
-1. Click en el botón "Editar" de un usuario
-2. Modifica el teléfono
-3. Click en "Guardar"
-
-**✅ Resultado:** Cambios guardados
-
-##### E. Eliminar Usuario (Soft Delete)
-1. Click en "Eliminar"
-2. Confirma la acción
-3. El usuario desaparece de la lista (pero NO se elimina de la BD)
-
----
-
-#### Paso 4: Gestión de Productos
-
-1. Click en **"Productos"** en el sidebar
-
-**Pruebas:**
-
-##### A. Ver Grid de Productos
-- Grid de cards con:
-  - Imagen del producto
-  - Nombre
-  - Precio
-  - Marca
-  - Stock total
-  - Badge de "Activo/Inactivo"
-  - Badge de "Destacado" (si aplica)
-  - Botones: Ver, Editar, Eliminar
-
-##### B. Buscar Producto
-1. Escribe "vestido" en la búsqueda
-2. Grid se filtra en tiempo real
-
-##### C. Crear Producto
-1. Click en **"Crear Producto"**
-2. Llena el formulario:
-   ```
-   Nombre: Vestido Casual Verano
-   Descripción: Hermoso vestido para el verano...
-   Precio: 299.99
-   Marca: Zara (seleccionar del dropdown)
-   Categorías: Vestidos (checkbox)
-   Tallas: S, M, L (checkboxes)
-   Color: Azul
-   Material: Algodón
-   Imagen: Subir archivo
-   Stock por talla:
-     - S: 10
-     - M: 15
-     - L: 8
-   ```
-3. Marcar como "Activo" y "Destacado"
-4. Click en **"Guardar"**
-
-**✅ Resultado:**
-- Producto creado con slug auto-generado
-- Aparece en el grid
-- Stock creado para cada talla seleccionada
-
-##### D. Editar Producto
-1. Click en "Editar" de un producto
-2. Cambia el precio a 350.00
-3. Marca como "Es Novedad"
-4. Click en "Guardar"
-
-**✅ Resultado:** Cambios guardados
-
-##### E. Eliminar Producto
-1. Click en "Eliminar"
-2. Confirma
-3. El producto desaparece (soft delete)
-
----
-
-#### Paso 5: Gestión de Categorías
-
-1. Click en **"Categorías"** en el sidebar
-
-**Pruebas:**
-
-##### A. Ver Categorías
-- Grid de cards con:
-  - Icono
-  - Nombre
-  - Descripción (truncada)
-  - Contador de productos
-  - Botones: Editar, Eliminar
-
-##### B. Crear Categoría
-1. Click en **"Crear Categoría"**
-2. Llena:
-   ```
-   Nombre: Accesorios
-   Descripción: Carteras, cinturones, etc.
-   Imagen: Subir archivo
-   ```
-3. Click en "Guardar"
-
-**✅ Resultado:** Categoría creada
-
-##### C. Editar Categoría
-1. Click en "Editar"
-2. Cambia la descripción
-3. Guarda
-
-##### D. Eliminar Categoría
-1. Click en "Eliminar"
-2. **Validación:** Si tiene productos asociados, muestra advertencia
-
----
-
-#### Paso 6: Gestión de Roles
-
-1. Click en **"Roles"** en el sidebar
-
-**Pruebas:**
-
-##### A. Ver Roles
-- Grid de cards con:
-  - Icono de Shield
-  - Nombre del rol
-  - Lista de permisos (primeros 5 + contador)
-  - Contador de usuarios con ese rol
-  - Badge "Rol del Sistema" (no se puede eliminar)
-  - Botones: Editar, Eliminar
-
-##### B. Crear Rol Personalizado
-1. Click en **"Crear Rol"**
-2. Llena:
-   ```
-   Nombre: Supervisor
-   Descripción: Supervisor de ventas
-   Permisos: Seleccionar checkboxes de:
-     - productos.leer
-     - productos.actualizar
-     - pedidos.leer
-     - pedidos.actualizar
-     - reportes.generar
-   ```
-3. Click en "Guardar"
-
-**✅ Resultado:** Rol creado con permisos asignados
-
-##### C. Editar Rol
-1. Click en "Editar" de un rol NO del sistema
-2. Agrega/quita permisos
-3. Guarda
-
-**✅ Resultado:** Permisos actualizados
-
-##### D. Eliminar Rol
-1. Click en "Eliminar" de un rol NO del sistema
-2. **Validación:** Si tiene usuarios asignados, muestra advertencia
-3. Confirma
-
-**⚠️ Roles del Sistema:**
-- Admin, Empleado, Cliente NO se pueden eliminar (es_rol_sistema=True)
-
----
-
-#### Paso 7: Gestión de Pedidos (Pendiente)
-
-**Ruta esperada:** `/admin/orders`
-
-**Funcionalidades requeridas:**
-- Tabla de todos los pedidos del sistema
-- Filtros por:
-  - Estado (Pendiente, Confirmado, Enviado, etc.)
-  - Usuario (buscar por nombre/email)
-  - Rango de fechas
-  - Método de pago
-- Acciones:
-  - Ver detalle
-  - Cambiar estado (dropdown)
-  - Imprimir comprobante (PDF)
-  - Cancelar pedido
-
-**⚠️ Estado:** NO implementado
-
----
-
-#### Paso 8: Reportes (Pendiente)
-
-**Ruta esperada:** `/admin/reports`
-
-**Funcionalidades requeridas:**
-- Formulario para generar reportes dinámicos
-- Campos:
-  - Tipo de reporte (dropdown):
-    - Ventas por período
-    - Productos más vendidos
-    - Clientes con más compras
-    - Inventario bajo stock
-  - Rango de fechas
-  - Formato (PDF, Excel, Pantalla)
-  - Agrupación (opcional): por producto, categoría, cliente
-- Botón "Generar Reporte"
-- **Bonus:** Input de texto/voz para prompts libres
-  - Ejemplo: "Quiero un reporte de ventas de septiembre en PDF"
-
-**⚠️ Estado:** NO implementado (parte de Ciclo 2)
-
----
-
-## 👷 Flujo de Prueba - Empleado
-
-### Escenario: Empleado realiza ventas y gestiona inventario
-
-#### Paso 1: Login como Empleado
-
-1. Navega a `/login`
-2. Credenciales:
-   ```
-   Email: empleado@smartsales365.com
-   Password: Empleado2024!
-   ```
-
-**✅ Resultado Esperado:**
-- Login exitoso
-- Redirige a `/admin` (mismo dashboard que Admin)
-- **PERO** no puede ver/editar usuarios ni roles
-
----
-
-#### Paso 2: Verificar Permisos
-
-1. En el sidebar del dashboard, intenta acceder a "Usuarios"
-
-**✅ Resultado Esperado:**
-- Si la verificación de permisos está implementada:
-  - El item "Usuarios" NO aparece en el menú
-  - O aparece deshabilitado
-- Si NO está implementada (actualmente):
-  - Aparece el item pero **NO debería**
-
-**⚠️ Problema Conocido:**
-- La función `hasPermission()` siempre retorna `true`
-- Empleados pueden ver secciones que NO deberían
-
----
-
-#### Paso 3: Gestionar Productos
-
-1. Click en "Productos"
-2. El empleado **SÍ** tiene permisos para:
-   - Ver productos
-   - Crear productos
-   - Editar productos
-   - Eliminar productos
-
-**Prueba:** Crea un producto nuevo
-
-**✅ Resultado:** Funciona correctamente
-
----
-
-#### Paso 4: Gestionar Pedidos (cuando esté implementado)
-
-1. Click en "Pedidos"
-2. El empleado puede:
-   - Ver todos los pedidos
-   - Cambiar estados (Confirmado → Preparando → Enviado)
-   - NO puede cancelar pedidos (solo Admin)
+**Credenciales por defecto:**
+- **Admin:** admin@test.com / Admin123!
+- **Cliente:** cliente@test.com / Cliente123!
 
 ---
 
 ## 🧪 Casos de Prueba por Módulo
 
-### Módulo: Autenticación
+---
 
-| # | Caso de Prueba                            | Pasos                                                | Resultado Esperado                        | Estado |
-|---|-------------------------------------------|------------------------------------------------------|-------------------------------------------|--------|
-| 1 | Registro exitoso                          | Llenar formulario válido y enviar                    | Usuario creado, redirige a login          | ✅      |
-| 2 | Registro con email duplicado              | Intentar registrar email existente                   | Error "Email ya existe"                   | ✅      |
-| 3 | Login exitoso (Admin)                     | Credenciales de admin                                | Redirige a `/admin`                       | ❌      |
-| 4 | Login exitoso (Cliente)                   | Credenciales de cliente                              | Redirige a `/`                            | ⚠️      |
-| 5 | Login con credenciales incorrectas        | Email o password inválido                            | Error "Credenciales inválidas"            | ✅      |
-| 6 | Logout                                    | Click en cerrar sesión                               | Limpia store y localStorage, redirige     | ✅      |
-| 7 | Acceso a ruta protegida sin login         | Ir a `/cart` sin estar autenticado                   | Redirige a `/login`                       | ✅      |
-| 8 | Refresh token automático                  | Esperar 60 min (token expira)                        | Se refresca automáticamente               | ❌      |
+### 🔐 Módulo: Autenticación
+
+#### **TC-AUTH-001: Registro de Usuario**
+
+**Ruta:** `/register`
+
+**Pasos:**
+1. Navegar a `http://localhost:5173/register`
+2. Verificar que se muestra el formulario de registro
+3. Llenar campos:
+   - **Nombre:** Juan
+   - **Apellido:** Pérez
+   - **Email:** juan.perez@test.com
+   - **Teléfono:** +591 75123456
+   - **Contraseña:** Test1234
+   - **Confirmar Contraseña:** Test1234
+4. Marcar checkbox de "Acepto los términos y condiciones"
+5. Click en "Crear cuenta"
+
+**Resultado Esperado:**
+- ✅ Aparece pantalla de éxito con checkmark verde
+- ✅ Mensaje: "¡Cuenta creada exitosamente!"
+- ✅ Auto-redirect a `/login` después de 3 segundos
+- ✅ No hay errores en consola
+
+**Validaciones a probar:**
+- ❌ Email inválido (sin @): debe mostrar error
+- ❌ Contraseña menor a 8 caracteres: debe mostrar error
+- ❌ Contraseñas no coinciden: debe mostrar error
+- ❌ Términos no aceptados: botón deshabilitado
 
 ---
 
-### Módulo: Productos
+#### **TC-AUTH-002: Login de Cliente**
 
-| # | Caso de Prueba                | Pasos                                | Resultado Esperado                     | Estado |
-|---|-------------------------------|--------------------------------------|----------------------------------------|--------|
-| 1 | Ver catálogo                  | Ir a `/products`                     | Lista de productos con imágenes        | ✅      |
-| 2 | Buscar producto               | Escribir en búsqueda                 | Productos filtrados                    | ✅      |
-| 3 | Filtrar por categoría         | Seleccionar categoría                | Solo productos de esa categoría        | ✅      |
-| 4 | Filtrar por marca             | Seleccionar marca                    | Solo productos de esa marca            | ✅      |
-| 5 | Filtrar por precio            | Ajustar rango de precio              | Productos dentro del rango             | ✅      |
-| 6 | Ver detalle                   | Click en un producto                 | Detalle completo con stock             | ✅      |
-| 7 | Ver stock por talla           | Seleccionar talla en detalle         | Muestra stock disponible               | ✅      |
-| 8 | Agregar a carrito (autenticado)| Agregar producto con talla          | Mensaje de éxito, carrito actualizado  | ⚠️      |
-| 9 | Agregar a carrito (sin login) | Intentar agregar sin estar autenticado| Redirige a login                      | ✅      |
+**Ruta:** `/login`
 
----
+**Pasos:**
+1. Navegar a `http://localhost:5173/login`
+2. Llenar campos:
+   - **Email:** cliente@test.com
+   - **Contraseña:** Cliente123!
+3. Click en "Iniciar sesión"
 
-### Módulo: Carrito
+**Resultado Esperado:**
+- ✅ Redirect a `/` (HomePage)
+- ✅ Navbar muestra "Hola, [Nombre]" y opciones de usuario
+- ✅ Token guardado en localStorage
+- ✅ No hay errores en consola
 
-| # | Caso de Prueba              | Pasos                                  | Resultado Esperado               | Estado |
-|---|-----------------------------|----------------------------------------|----------------------------------|--------|
-| 1 | Ver carrito vacío           | Ir a `/cart` sin items                 | Mensaje "Carrito vacío"          | ❌      |
-| 2 | Ver carrito con items       | Ir a `/cart` con items agregados       | Lista de items con totales       | ❌      |
-| 3 | Incrementar cantidad        | Click en botón "+"                     | Cantidad actualizada, total recalculado | ❌ |
-| 4 | Decrementar cantidad        | Click en botón "-"                     | Cantidad actualizada (mín 1)     | ❌      |
-| 5 | Eliminar item               | Click en "Eliminar"                    | Item desaparece, total recalcula | ❌      |
-| 6 | Vaciar carrito              | Click en "Vaciar carrito"              | Todos los items eliminados       | ❌      |
-| 7 | Validación de stock         | Intentar agregar más que el stock      | Error "Stock insuficiente"       | ❌      |
+**Validaciones a probar:**
+- ❌ Email incorrecto: debe mostrar error del backend
+- ❌ Contraseña incorrecta: debe mostrar error del backend
+- ✅ Toggle de visibilidad de contraseña funciona (icono Eye/EyeOff)
 
 ---
 
-### Módulo: Checkout
+#### **TC-AUTH-003: Login de Admin**
 
-| # | Caso de Prueba                 | Pasos                                       | Resultado Esperado                  | Estado |
-|---|--------------------------------|---------------------------------------------|-------------------------------------|--------|
-| 1 | Acceder a checkout sin items   | Ir a `/checkout` con carrito vacío          | Redirige a `/cart`                  | ❌      |
-| 2 | Seleccionar dirección          | Elegir dirección de la lista                | Dirección marcada como seleccionada | ❌      |
-| 3 | Crear nueva dirección          | Llenar formulario de dirección              | Dirección creada y seleccionada     | ❌      |
-| 4 | Seleccionar método de pago     | Elegir "Efectivo" o "PayPal"                | Método marcado                      | ❌      |
-| 5 | Ver resumen                    | Avanzar a paso 3                            | Resumen completo del pedido         | ❌      |
-| 6 | Confirmar pedido (Efectivo)    | Click en "Confirmar"                        | Pedido creado, redirige a detalle   | ❌      |
-| 7 | Confirmar pedido (PayPal)      | Click en "Confirmar"                        | Abre ventana de PayPal              | ❌      |
-| 8 | Carrito se vacía tras pedido   | Después de confirmar, revisar carrito       | Carrito vacío                       | ❌      |
+**Ruta:** `/login`
 
----
+**Pasos:**
+1. Navegar a `http://localhost:5173/login`
+2. Llenar campos:
+   - **Email:** admin@test.com
+   - **Contraseña:** Admin123!
+3. Click en "Iniciar sesión"
 
-### Módulo: Pedidos
-
-| # | Caso de Prueba           | Pasos                              | Resultado Esperado                | Estado |
-|---|--------------------------|------------------------------------|-----------------------------------|--------|
-| 1 | Ver mis pedidos          | Ir a `/orders`                     | Lista de todos mis pedidos        | ❌      |
-| 2 | Ver detalle de pedido    | Click en un pedido                 | Información completa del pedido   | ❌      |
-| 3 | Cancelar pedido (permite)| Cancelar pedido pendiente          | Estado cambia a "Cancelado"       | ❌      |
-| 4 | Cancelar pedido (no permite)| Intentar cancelar pedido enviado| Error "No se puede cancelar"      | ❌      |
+**Resultado Esperado:**
+- ✅ Redirect a `/admin` (AdminDashboard)
+- ✅ Navbar muestra opciones de admin
+- ✅ Token guardado en localStorage
+- ✅ No hay errores en consola
 
 ---
 
-### Módulo: Dashboard Admin
+#### **TC-AUTH-004: Logout**
 
-| # | Caso de Prueba                    | Pasos                                  | Resultado Esperado                     | Estado |
-|---|-----------------------------------|----------------------------------------|----------------------------------------|--------|
-| 1 | Acceso solo Admin/Empleado        | Intentar acceder con rol Cliente       | Redirige a `/`                         | ✅      |
-| 2 | Ver lista de usuarios             | Ir a `/admin/users`                    | Tabla de usuarios completa             | ✅      |
-| 3 | Buscar usuario                    | Escribir en búsqueda                   | Usuarios filtrados                     | ✅      |
-| 4 | Crear usuario                     | Llenar formulario y guardar            | Usuario creado                         | ✅      |
-| 5 | Editar usuario                    | Modificar datos y guardar              | Cambios guardados                      | ✅      |
-| 6 | Eliminar usuario (soft delete)    | Click en eliminar y confirmar          | Usuario desaparece (is_deleted=true)   | ✅      |
-| 7 | Ver lista de productos            | Ir a `/admin/products`                 | Grid de productos                      | ✅      |
-| 8 | Crear producto con stock          | Crear producto con 3 tallas            | Producto + 3 registros de stock        | ✅      |
-| 9 | Ver roles                         | Ir a `/admin/roles`                    | Grid de roles con permisos             | ✅      |
-| 10| Crear rol personalizado           | Crear rol con permisos seleccionados   | Rol creado                             | ✅      |
-| 11| Verificación de permisos (Admin)  | Admin accede a todo                    | Sin restricciones                      | ⚠️      |
-| 12| Verificación de permisos (Empleado)| Empleado no ve usuarios ni roles      | Items ocultos o deshabilitados         | ❌      |
+**Pasos:**
+1. Estando logueado, click en menú de usuario (navbar)
+2. Click en "Cerrar sesión"
+
+**Resultado Esperado:**
+- ✅ Redirect a `/login`
+- ✅ Token eliminado de localStorage
+- ✅ Navbar vuelve a estado no autenticado
 
 ---
 
-## 🐛 Errores Comunes y Soluciones
+### 🛒 Módulo: Carrito
 
-### 1. Error 401 (Unauthorized)
+#### **TC-CART-001: Ver Carrito Vacío**
 
-**Síntomas:**
-- Al hacer peticiones, el backend retorna 401
-- El usuario es redirigido al login constantemente
+**Ruta:** `/cart`
 
-**Causas:**
-- Token expirado (después de 60 minutos)
-- Token no se está enviando en el header
+**Precondición:** Usuario logueado como cliente
 
-**Soluciones:**
-1. Verifica que el token esté en localStorage:
-   ```javascript
-   console.log(localStorage.getItem('access_token'));
-   ```
-2. Verifica el interceptor de request en `api.config.ts`
-3. Si el token expiró, debería refrescarse automáticamente (NO implementado aún)
+**Pasos:**
+1. Navegar a `/cart`
+2. Verificar que carrito está vacío (o limpiarlo manualmente)
 
-**Solución temporal:** Vuelve a hacer login
+**Resultado Esperado:**
+- ✅ Muestra componente EmptyCart con icono de shopping bag
+- ✅ Mensaje: "Tu carrito está vacío"
+- ✅ Botón "Explorar productos" navega a `/products`
 
 ---
 
-### 2. CORS Error
+#### **TC-CART-002: Agregar Producto al Carrito**
 
-**Síntomas:**
-- Error en consola: "Access to XMLHttpRequest has been blocked by CORS policy"
+**Ruta:** `/products/:slug`
 
-**Causas:**
-- Backend no tiene CORS configurado para el frontend
+**Pasos:**
+1. Navegar a `/products`
+2. Click en un producto
+3. Seleccionar una talla del dropdown
+4. Cambiar cantidad (ej: 2)
+5. Click en "Agregar al carrito"
 
-**Solución:**
-1. En el backend, verifica `config/settings/base.py`:
-   ```python
-   CORS_ALLOWED_ORIGINS = [
-       "http://localhost:5173",  # Frontend Vite
-       "http://localhost:3000",  # Alternativa
-   ]
-   ```
-2. Reinicia el backend
+**Resultado Esperado:**
+- ✅ Mensaje de éxito (toast o notificación)
+- ✅ Contador de carrito en navbar se actualiza
+- ❌ **NOTA:** Actualmente comentado en ProductCard debido a que backend devuelve tallas como string en lugar de array
 
----
-
-### 3. Carrito no se actualiza
-
-**Síntomas:**
-- Agregas producto pero el contador del navbar no cambia
-- El carrito aparece vacío
-
-**Causas:**
-- CartPage no está conectado con el servicio
-- El servicio `cart.service.ts` existe pero la página no lo usa
-
-**Solución:**
-- Implementar la conexión (ver sección de Carrito en documentation_guide.md)
-
----
-
-### 4. Login siempre redirige a "/"
-
-**Síntomas:**
-- Haces login como Admin pero vas a la página principal, no al dashboard
-
-**Causa:**
-- Bug conocido en `LoginPage.tsx` línea 33
-
-**Solución temporal:**
-- Navega manualmente a `/admin`
-
-**Solución permanente:**
-```typescript
-// Cambiar esto:
-navigate("/");
-
-// Por esto:
-const rol = response.user.rol_detalle?.nombre;
-if (rol === "Admin" || rol === "Empleado") {
-  navigate("/admin");
-} else {
-  navigate("/");
-}
+**Pendiente:** Backend debe devolver `tallas_disponibles_detalle` como:
+```json
+[
+  { "id": "1", "nombre": "S", "stock": 5 },
+  { "id": "2", "nombre": "M", "stock": 3 }
+]
 ```
 
 ---
 
-### 5. Imágenes de productos no se ven
+#### **TC-CART-003: Ver Carrito con Items**
 
-**Síntomas:**
-- Los productos aparecen sin imagen o con imagen rota
+**Ruta:** `/cart`
 
-**Causas:**
-- Las imágenes están en S3 pero `USE_S3=False`
-- No se subieron imágenes con el seeder
+**Precondición:** Carrito con al menos 1 item
 
-**Solución:**
-1. Ejecutar script de subida a S3:
-   ```bash
-   python scripts/upload_to_s3.py --category vestidos --folder ./datasets/vestidos/
-   ```
-2. O usar imágenes placeholder en el seeder
+**Pasos:**
+1. Navegar a `/cart`
+
+**Resultado Esperado:**
+- ✅ Muestra lista de CartItem (imagen, nombre, talla, precio)
+- ✅ Cada item tiene botones +/- para cantidad
+- ✅ Cada item tiene botón de eliminar (X rojo)
+- ✅ CartSummary muestra subtotal, envío, total correctamente
+- ✅ Botón "Proceder al pago" habilitado
 
 ---
 
-### 6. Filtros de productos no funcionan
+#### **TC-CART-004: Actualizar Cantidad de Item**
 
-**Síntomas:**
-- Cambias filtros pero los productos no se actualizan
+**Ruta:** `/cart`
 
-**Causa:**
-- Falta el `useEffect` que escucha cambios en los filtros
+**Pasos:**
+1. En un item del carrito, click en botón "+"
+2. Verificar que cantidad aumenta
+3. Click en botón "-"
+4. Verificar que cantidad disminuye
 
-**Solución:**
-```typescript
-useEffect(() => {
-  loadProducts();
-}, [filters]); // Agregar filters como dependencia
+**Resultado Esperado:**
+- ✅ Cantidad se actualiza en el item
+- ✅ Subtotal del item se recalcula
+- ✅ Total en CartSummary se actualiza
+- ✅ Llamada a `cartService.updateItem()` exitosa
+- ❌ Si cantidad es 1, botón "-" debe estar deshabilitado o eliminar el item
+
+---
+
+#### **TC-CART-005: Eliminar Item del Carrito**
+
+**Ruta:** `/cart`
+
+**Pasos:**
+1. Click en botón de eliminar (X) de un item
+2. Confirmar en el diálogo
+
+**Resultado Esperado:**
+- ✅ Item desaparece del carrito
+- ✅ Total se recalcula
+- ✅ Llamada a `cartService.removeItem()` exitosa
+- ✅ Si era el último item, muestra EmptyCart
+
+---
+
+### 💳 Módulo: Checkout
+
+#### **TC-CHECKOUT-001: Acceder a Checkout sin Carrito**
+
+**Ruta:** `/checkout`
+
+**Precondición:** Carrito vacío
+
+**Pasos:**
+1. Navegar directamente a `/checkout`
+
+**Resultado Esperado:**
+- ✅ Redirect automático a `/products`
+- ✅ Mensaje indicando que el carrito está vacío
+
+---
+
+#### **TC-CHECKOUT-002: Proceso Completo de Checkout**
+
+**Ruta:** `/checkout`
+
+**Precondición:** 
+- Usuario logueado como cliente
+- Carrito con al menos 1 item
+- Usuario tiene al menos 1 dirección guardada
+
+**Pasos:**
+1. Desde `/cart`, click en "Proceder al pago"
+2. Verificar que carga checkout con loading spinner
+3. **Sección Direcciones:**
+   - Verificar que se muestran direcciones del usuario
+   - Dirección principal debe estar pre-seleccionada
+   - Seleccionar una dirección (radio button)
+4. **Sección Métodos de Pago:**
+   - Verificar que se muestran métodos de pago disponibles
+   - Primer método activo debe estar pre-seleccionado
+   - Seleccionar un método (radio button)
+5. **Sección Resumen:**
+   - Verificar que muestra items del carrito
+   - Verificar que muestra dirección seleccionada
+   - Verificar que muestra método de pago seleccionado
+   - Agregar notas opcionales (ej: "Tocar timbre 2 veces")
+   - Verificar totales (subtotal + envío)
+6. Click en "Confirmar pedido"
+
+**Resultado Esperado:**
+- ✅ Botón muestra loading spinner
+- ✅ Se crea el pedido exitosamente
+- ✅ Carrito se vacía (llamada a `clearCart()`)
+- ✅ Redirect a `/orders/{orderId}`
+- ✅ No hay errores en consola
+
+**Validaciones:**
+- ❌ Si no hay dirección seleccionada: botón "Confirmar" deshabilitado
+- ❌ Si no hay método de pago seleccionado: botón "Confirmar" deshabilitado
+
+---
+
+#### **TC-CHECKOUT-003: Agregar Nueva Dirección desde Checkout**
+
+**Ruta:** `/checkout`
+
+**Pasos:**
+1. En sección de direcciones, click en "Agregar nueva dirección"
+
+**Resultado Esperado:**
+- ✅ Abre modal o navega a formulario
+- ❌ **NOTA:** Actualmente es placeholder (alerta), pendiente implementación completa
+
+---
+
+### 👤 Módulo: Perfil (Customers)
+
+#### **TC-PROFILE-001: Ver Datos Personales**
+
+**Ruta:** `/profile`
+
+**Precondición:** Usuario logueado como cliente
+
+**Pasos:**
+1. Navegar a `/profile`
+2. Verificar que tab "Datos Personales" está activo por defecto
+
+**Resultado Esperado:**
+- ✅ Muestra ProfileForm con datos del usuario
+- ✅ Campos de solo lectura: nombre, apellido, email (con helper text indicando contactar soporte)
+- ✅ Campos editables deshabilitados: teléfono, fecha nacimiento, género
+- ✅ Muestra saldo de billetera con botón "Recargar"
+- ✅ Botón "Editar" visible
+
+---
+
+#### **TC-PROFILE-002: Editar Datos Personales**
+
+**Ruta:** `/profile` (tab Datos Personales)
+
+**Pasos:**
+1. Click en botón "Editar"
+2. Campos editables se habilitan
+3. Modificar teléfono: +591 78999888
+4. Seleccionar fecha de nacimiento: 15/08/1990
+5. Seleccionar género: Femenino
+6. Click en "Guardar cambios"
+
+**Resultado Esperado:**
+- ✅ Botón muestra loading spinner
+- ✅ Llamada a `customersService.updateProfile()` exitosa
+- ✅ Campos vuelven a estar deshabilitados
+- ✅ Datos actualizados visibles
+- ✅ Botón "Editar" reaparece
+
+**Validación:**
+- ✅ Botón "Cancelar" descarta cambios y vuelve a modo vista
+
+---
+
+#### **TC-PROFILE-003: Ver Direcciones**
+
+**Ruta:** `/profile` (tab Mis Direcciones)
+
+**Pasos:**
+1. Click en tab "Mis Direcciones"
+2. Verificar listado de direcciones
+
+**Resultado Esperado:**
+- ✅ Muestra AddressList con grid de tarjetas
+- ✅ Dirección principal tiene badge "Principal" con estrella
+- ✅ Cada dirección muestra: calle, número, colonia, ciudad, estado, CP, referencias
+- ✅ Botones visibles: "Hacer principal" (si no es principal), "Editar", "Eliminar"
+- ✅ Botón "Nueva dirección" en header
+
+**Si no hay direcciones:**
+- ✅ Muestra empty state con icono de mapa
+- ✅ Mensaje: "No tienes direcciones guardadas"
+
+---
+
+#### **TC-PROFILE-004: Crear Nueva Dirección**
+
+**Ruta:** `/profile` (tab Mis Direcciones)
+
+**Pasos:**
+1. Click en "Nueva dirección"
+2. Verificar que abre modal AddressForm
+3. Llenar campos:
+   - **Calle:** Av. 16 de Julio
+   - **N° Exterior:** 1234
+   - **N° Interior:** Depto 5A (opcional)
+   - **Colonia/Zona:** Sopocachi
+   - **Ciudad:** La Paz
+   - **Estado:** La Paz
+   - **Código Postal:** 00000
+   - **Referencias:** Casa esquina, portón azul
+4. Marcar checkbox "Establecer como dirección principal"
+5. Click en "Crear dirección"
+
+**Resultado Esperado:**
+- ✅ Modal se cierra
+- ✅ Nueva dirección aparece en AddressList
+- ✅ Si se marcó como principal, tiene badge "Principal"
+- ✅ Llamada a `customersService.createAddress()` exitosa
+- ✅ Lista se recarga
+
+---
+
+#### **TC-PROFILE-005: Editar Dirección**
+
+**Ruta:** `/profile` (tab Mis Direcciones)
+
+**Pasos:**
+1. Click en botón "Editar" (ícono de lápiz) de una dirección
+2. Verificar que abre modal con datos pre-llenados
+3. Modificar campo "Referencias": "Edificio azul, 2do piso"
+4. Click en "Guardar cambios"
+
+**Resultado Esperado:**
+- ✅ Modal se cierra
+- ✅ Dirección actualizada visible en lista
+- ✅ Llamada a `customersService.updateAddress()` exitosa
+
+---
+
+#### **TC-PROFILE-006: Eliminar Dirección**
+
+**Ruta:** `/profile` (tab Mis Direcciones)
+
+**Pasos:**
+1. Click en botón "Eliminar" (ícono de basura rojo)
+2. Confirmar en diálogo de confirmación
+
+**Resultado Esperado:**
+- ✅ Dirección desaparece de la lista
+- ✅ Llamada a `customersService.deleteAddress()` exitosa
+
+**Validación:**
+- ❌ No debería permitir eliminar la única dirección principal (opcional)
+
+---
+
+#### **TC-PROFILE-007: Hacer Dirección Principal**
+
+**Ruta:** `/profile` (tab Mis Direcciones)
+
+**Precondición:** Usuario tiene al menos 2 direcciones
+
+**Pasos:**
+1. En una dirección que NO es principal, click en "Hacer principal"
+
+**Resultado Esperado:**
+- ✅ Badge "Principal" se mueve a esta dirección
+- ✅ Dirección anterior pierde el badge
+- ✅ Llamada a `customersService.updateAddress(id, { es_principal: true })` exitosa
+
+---
+
+#### **TC-PROFILE-008: Cambiar Contraseña**
+
+**Ruta:** `/profile` (tab Seguridad)
+
+**Pasos:**
+1. Click en tab "Seguridad"
+2. Verificar que muestra SecuritySettings
+3. Llenar campos:
+   - **Contraseña actual:** Cliente123!
+   - **Nueva contraseña:** NuevaPass123!
+   - **Confirmar nueva contraseña:** NuevaPass123!
+4. Verificar toggles de visibilidad funcionan (Eye icons)
+5. Click en "Cambiar contraseña"
+
+**Resultado Esperado:**
+- ✅ Botón muestra loading spinner
+- ✅ Aparece mensaje de éxito en verde: "✓ Contraseña actualizada exitosamente"
+- ✅ Form se limpia
+- ✅ No hay errores
+
+**Validaciones a probar:**
+- ❌ Contraseña actual incorrecta: debe mostrar error
+- ❌ Nueva contraseña menor a 8 caracteres: debe mostrar error de validación
+- ❌ Contraseñas no coinciden: debe mostrar error de validación
+- ❌ Nueva contraseña igual a la actual: debe mostrar error de validación
+
+---
+
+### 📦 Módulo: Pedidos (Orders)
+
+#### **TC-ORDERS-001: Ver Lista de Pedidos Vacía**
+
+**Ruta:** `/orders`
+
+**Precondición:** Usuario sin pedidos
+
+**Pasos:**
+1. Navegar a `/orders`
+
+**Resultado Esperado:**
+- ✅ Muestra empty state con ícono de paquete
+- ✅ Mensaje: "No tienes pedidos aún"
+- ✅ Sugerencia: "Comienza a explorar nuestros productos..."
+
+---
+
+#### **TC-ORDERS-002: Ver Lista de Pedidos**
+
+**Ruta:** `/orders`
+
+**Precondición:** Usuario tiene pedidos
+
+**Pasos:**
+1. Navegar a `/orders`
+2. Verificar que carga con loading spinner
+3. Verificar grid de OrderCard
+
+**Resultado Esperado:**
+- ✅ Muestra grid de pedidos (1 col móvil, 2 tablet, 3 desktop)
+- ✅ Cada OrderCard muestra:
+  - Número de pedido
+  - Fecha en formato legible (ej: "23 de octubre, 2025")
+  - Badge de estado con color (pendiente: amarillo, procesando: azul, enviado: púrpura, entregado: verde, cancelado: rojo)
+  - Preview de primeros 2 items con imágenes
+  - "+X artículos más" si hay más de 2
+  - Total del pedido
+  - Botón "Ver detalles"
+- ✅ Contador de resultados: "Mostrando X de X pedidos"
+
+---
+
+#### **TC-ORDERS-003: Filtrar Pedidos por Estado**
+
+**Ruta:** `/orders`
+
+**Pasos:**
+1. Click en botón "Filtros"
+2. Verificar que abre panel flotante
+3. En dropdown "Estado", seleccionar "Entregado"
+4. Click en "Aplicar"
+
+**Resultado Esperado:**
+- ✅ Panel se cierra
+- ✅ Lista muestra solo pedidos con estado "entregado"
+- ✅ Contador de filtros activos en botón: badge con "1"
+- ✅ Contador de resultados actualizado: "Mostrando X de Y pedidos"
+
+---
+
+#### **TC-ORDERS-004: Filtrar Pedidos por Rango de Fechas**
+
+**Ruta:** `/orders`
+
+**Pasos:**
+1. Click en botón "Filtros"
+2. Seleccionar "Desde": 01/10/2025
+3. Seleccionar "Hasta": 31/10/2025
+4. Click en "Aplicar"
+
+**Resultado Esperado:**
+- ✅ Lista muestra solo pedidos entre esas fechas
+- ✅ Badge de filtros activos muestra "2"
+
+---
+
+#### **TC-ORDERS-005: Limpiar Filtros**
+
+**Ruta:** `/orders`
+
+**Pasos:**
+1. Con filtros aplicados, abrir panel de filtros
+2. Click en "Limpiar"
+
+**Resultado Esperado:**
+- ✅ Todos los filtros se resetean
+- ✅ Lista muestra todos los pedidos nuevamente
+- ✅ Badge de filtros desaparece del botón
+
+---
+
+#### **TC-ORDERS-006: Ver Detalle de Pedido**
+
+**Ruta:** `/orders/:id`
+
+**Pasos:**
+1. Desde OrdersPage, click en "Ver detalles" de un pedido
+2. Verificar que navega a `/orders/{id}`
+3. Verificar que carga con loading spinner
+
+**Resultado Esperado:**
+- ✅ **Columna Izquierda (OrderDetail):**
+  - Header con número de pedido y total grande
+  - Fecha completa con hora
+  - Sección "Artículos (X)" con todos los items:
+    - Imagen del producto
+    - Nombre, talla, cantidad
+    - Precio unitario y subtotal
+  - Totales: subtotal y total
+  - Sección "Dirección de envío" completa
+  - Sección "Método de pago" con nombre y tipo
+  - Sección "Información del cliente" con nombre y email
+
+- ✅ **Columna Derecha (OrderTimeline):**
+  - Timeline vertical con 4 pasos:
+    - Pedido recibido (CheckCircle icon)
+    - Procesando (Package icon)
+    - Enviado (Truck icon)
+    - Entregado (Home icon)
+  - Paso actual con animación pulse
+  - Pasos completados con checkmark verde
+  - Línea de progreso vertical coloreada hasta paso actual
+  - Si estado es "enviado": mensaje de entrega estimada (3-5 días)
+
+- ✅ **Botón "Volver a mis pedidos"** en header
+
+---
+
+#### **TC-ORDERS-007: Cancelar Pedido**
+
+**Ruta:** `/orders/:id`
+
+**Precondición:** Pedido en estado "pendiente" o "procesando"
+
+**Pasos:**
+1. En OrderDetailPage, verificar que botón "Cancelar pedido" está visible (rojo)
+2. Click en "Cancelar pedido"
+3. Confirmar en diálogo
+
+**Resultado Esperado:**
+- ✅ Botón muestra loading spinner
+- ✅ Llamada a `ordersService.cancelOrder(id)` exitosa
+- ✅ Página se recarga mostrando nuevo estado "cancelado"
+- ✅ Timeline muestra estado especial para cancelado (emoji ❌, fondo rojo)
+- ✅ Botón "Cancelar pedido" desaparece
+
+**Validación:**
+- ❌ Si pedido está en estado "enviado" o "entregado", botón NO debe aparecer
+
+---
+
+### 🏠 Módulo: Productos
+
+#### **TC-PRODUCTS-001: Ver HomePage**
+
+**Ruta:** `/`
+
+**Pasos:**
+1. Navegar a `http://localhost:5173/`
+
+**Resultado Esperado:**
+- ✅ HeroCarousel se muestra correctamente en la parte superior
+- ✅ Slides cambian automáticamente cada 5 segundos
+- ✅ Botones de navegación (flechas) funcionan
+- ✅ Sección "Productos Destacados" muestra grid de ProductCard
+- ✅ Sección "Recién Llegados" muestra grid de ProductCard
+- ✅ ProductCard tiene sombras 3D y hover effect (elevación)
+
+---
+
+#### **TC-PRODUCTS-002: Ver Catálogo Completo**
+
+**Ruta:** `/products`
+
+**Pasos:**
+1. Click en "Ver todo el catálogo" desde HomePage o navegar a `/products`
+
+**Resultado Esperado:**
+- ✅ Muestra grid de ProductCard
+- ✅ ProductFilters en sidebar (o modal en móvil)
+- ✅ Productos cargados desde backend
+- ✅ Loading state mientras carga
+
+---
+
+#### **TC-PRODUCTS-003: Ver Detalle de Producto**
+
+**Ruta:** `/products/:slug`
+
+**Pasos:**
+1. Desde ProductsPage, click en un ProductCard
+2. Verificar que navega a `/products/{slug}`
+
+**Resultado Esperado:**
+- ✅ Muestra galería de imágenes (principal + thumbnails)
+- ✅ Nombre, precio, descripción, categoría
+- ✅ Selector de talla (dropdown)
+- ✅ Selector de cantidad
+- ✅ Botón "Agregar al carrito" (actualmente comentado)
+- ✅ Tabs de información (Descripción, Cuidados, Envío)
+- ✅ Sección de productos relacionados
+
+---
+
+## 🔄 Flujos End-to-End
+
+### **E2E-001: Flujo Completo de Compra (Cliente Nuevo)**
+
+**Objetivo:** Simular un usuario nuevo que se registra, explora, compra y revisa su pedido.
+
+**Pasos:**
+
+1. **Registro**
+   - Navegar a `/register`
+   - Registrar nuevo usuario
+   - Confirmar redirect a `/login`
+
+2. **Login**
+   - Login con credenciales del nuevo usuario
+   - Confirmar redirect a `/`
+
+3. **Explorar Productos**
+   - Navegar por HomePage
+   - Click en "Ver todo el catálogo"
+   - Filtrar por categoría
+   - Click en un producto
+
+4. **Agregar al Carrito**
+   - Seleccionar talla
+   - Ajustar cantidad
+   - Click en "Agregar al carrito"
+   - Verificar notificación de éxito
+
+5. **Ver Carrito**
+   - Navegar a `/cart`
+   - Verificar item agregado
+   - Ajustar cantidad si necesario
+
+6. **Configurar Perfil (Primera vez)**
+   - Navegar a `/profile`
+   - Tab "Mis Direcciones"
+   - Click en "Nueva dirección"
+   - Crear dirección de envío
+   - Marcar como principal
+
+7. **Checkout**
+   - Desde `/cart`, click en "Proceder al pago"
+   - Verificar dirección pre-seleccionada
+   - Seleccionar método de pago
+   - Agregar notas opcionales
+   - Click en "Confirmar pedido"
+
+8. **Ver Pedido**
+   - Verificar redirect a `/orders/{id}`
+   - Revisar detalles del pedido
+   - Verificar timeline en "Pedido recibido"
+
+9. **Revisar Lista de Pedidos**
+   - Navegar a `/orders`
+   - Verificar que aparece el nuevo pedido
+   - Filtrar por estado "pendiente"
+
+**Resultado Esperado:**
+- ✅ Flujo completo sin errores
+- ✅ Todos los datos correctos en cada paso
+- ✅ No hay errores en consola
+- ✅ Pedido creado exitosamente en backend
+
+---
+
+### **E2E-002: Flujo de Gestión de Perfil**
+
+**Pasos:**
+
+1. Login como cliente existente
+2. Navegar a `/profile`
+3. **Tab Datos Personales:**
+   - Editar teléfono, fecha nacimiento, género
+   - Guardar cambios
+4. **Tab Mis Direcciones:**
+   - Crear 2 direcciones nuevas
+   - Hacer la segunda como principal
+   - Editar la primera
+   - Eliminar una dirección
+5. **Tab Seguridad:**
+   - Cambiar contraseña
+   - Logout
+   - Login con nueva contraseña
+
+**Resultado Esperado:**
+- ✅ Todos los cambios se guardan correctamente
+- ✅ Login con nueva contraseña funciona
+
+---
+
+### **E2E-003: Flujo de Admin**
+
+**Pasos:**
+
+1. Login como admin (admin@test.com)
+2. Verificar redirect a `/admin`
+3. Navegar a cada sección de admin:
+   - Dashboard
+   - Gestión de Usuarios
+   - Gestión de Productos
+   - Gestión de Categorías
+   - Gestión de Roles
+4. Crear un producto nuevo
+5. Editar el producto
+6. Logout
+
+**Resultado Esperado:**
+- ✅ Todas las secciones cargan correctamente
+- ✅ CRUD de productos funciona
+- ✅ Admin puede gestionar todos los módulos
+
+---
+
+## ✅ Checklist de Validación Final
+
+### Funcionalidades Core
+
+- [ ] **Autenticación**
+  - [ ] Registro funciona
+  - [ ] Login de cliente funciona
+  - [ ] Login de admin funciona
+  - [ ] Logout funciona
+  - [ ] Tokens se guardan en localStorage
+  - [ ] Protected routes redirigen a login si no autenticado
+
+- [ ] **Carrito**
+  - [ ] Agregar item funciona
+  - [ ] Ver carrito funciona
+  - [ ] Actualizar cantidad funciona
+  - [ ] Eliminar item funciona
+  - [ ] Empty state se muestra correctamente
+
+- [ ] **Checkout**
+  - [ ] Carga direcciones correctamente
+  - [ ] Carga métodos de pago correctamente
+  - [ ] Auto-selección funciona
+  - [ ] Crear orden funciona
+  - [ ] Carrito se vacía después de orden
+  - [ ] Redirect a detalle de orden funciona
+
+- [ ] **Perfil**
+  - [ ] Ver datos personales funciona
+  - [ ] Editar datos funciona
+  - [ ] Ver direcciones funciona
+  - [ ] Crear dirección funciona
+  - [ ] Editar dirección funciona
+  - [ ] Eliminar dirección funciona
+  - [ ] Hacer dirección principal funciona
+  - [ ] Cambiar contraseña funciona
+
+- [ ] **Pedidos**
+  - [ ] Ver lista de pedidos funciona
+  - [ ] Filtrar por estado funciona
+  - [ ] Filtrar por fecha funciona
+  - [ ] Ver detalle de pedido funciona
+  - [ ] Timeline se muestra correctamente
+  - [ ] Cancelar pedido funciona
+
+- [ ] **Productos**
+  - [ ] HomePage carga correctamente
+  - [ ] HeroCarousel funciona
+  - [ ] Catálogo carga productos
+  - [ ] Filtros funcionan
+  - [ ] Detalle de producto funciona
+
+### UI/UX
+
+- [ ] Navbar se muestra correctamente
+- [ ] Logo visible
+- [ ] Colores del tema aplicados
+- [ ] Botones tienen hover effects
+- [ ] Loading spinners se muestran durante cargas
+- [ ] Modales se abren y cierran correctamente
+- [ ] Forms tienen validación
+- [ ] Mensajes de error son claros
+- [ ] Responsive en móvil, tablet, desktop
+
+### Consola del Navegador
+
+- [ ] No hay errores en consola
+- [ ] No hay warnings críticos
+- [ ] Peticiones HTTP exitosas (200, 201)
+- [ ] Tokens se envían en headers (Authorization: Bearer)
+
+---
+
+## 🐛 Reporte de Errores
+
+Si encuentras algún error durante el testing, repórtalo con este formato:
+
+**Título:** Breve descripción del error
+
+**Pasos para reproducir:**
+1. Paso 1
+2. Paso 2
+3. Paso 3
+
+**Resultado esperado:**
+Lo que debería pasar
+
+**Resultado actual:**
+Lo que realmente pasó
+
+**Consola:**
+```
+Errores de consola (si los hay)
 ```
 
----
-
-## ✅ Checklist de Testing Completo
-
-### Funcionalidades Básicas
-- [ ] Registro de usuario
-- [ ] Login (Admin, Empleado, Cliente)
-- [ ] Logout
-- [ ] Ver catálogo de productos
-- [ ] Buscar productos
-- [ ] Filtrar productos (categoría, marca, precio)
-- [ ] Ver detalle de producto
-- [ ] Agregar al carrito
-- [ ] Ver carrito
-- [ ] Modificar cantidad en carrito
-- [ ] Eliminar item del carrito
-- [ ] Proceder al checkout
-- [ ] Seleccionar dirección de envío
-- [ ] Seleccionar método de pago
-- [ ] Confirmar pedido
-- [ ] Ver mis pedidos
-- [ ] Ver detalle de pedido
-- [ ] Cancelar pedido
-
-### Panel Administrativo
-- [ ] Acceso al dashboard admin
-- [ ] Ver lista de usuarios
-- [ ] Crear usuario
-- [ ] Editar usuario
-- [ ] Eliminar usuario (soft delete)
-- [ ] Ver lista de productos
-- [ ] Crear producto
-- [ ] Editar producto
-- [ ] Eliminar producto
-- [ ] Ver categorías
-- [ ] CRUD de categorías
-- [ ] Ver roles
-- [ ] CRUD de roles
-- [ ] Verificación de permisos por rol
-
-### Funcionalidades Avanzadas (Ciclo 2)
-- [ ] Gestión de favoritos
-- [ ] Gestión de perfil
-- [ ] Cambiar contraseña
-- [ ] Generar reportes dinámicos
-- [ ] Dashboard con estadísticas
-- [ ] Predicción de ventas (IA)
-- [ ] Notificaciones en tiempo real
+**Screenshot:** (adjuntar si es posible)
 
 ---
 
-**Última actualización:** 6 de Noviembre 2025
+## 📊 Conclusión
 
-**Estado del Testing:**
-- Funcionalidades básicas: 60% probables
-- Panel admin: 70% probables
-- Funcionalidades avanzadas: 0% (pendientes)
+Al completar todos estos casos de prueba, habrás verificado:
+
+✅ Todos los módulos del frontend
+✅ Integración completa con el backend
+✅ Flujos de usuario end-to-end
+✅ UI/UX funcional y atractivo
+✅ No hay errores bloqueantes
+
+**¡Listo para producción!** 🚀
