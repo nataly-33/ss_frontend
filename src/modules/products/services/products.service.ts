@@ -1,6 +1,5 @@
 import api from "@core/config/api.config";
-import type { Product, Category, Brand } from "@modules/products/types";
-
+import type { Product, Category, Brand } from "../types";
 export const productsService = {
   async getProducts(params?: any) {
     const response = await api.get<{ results: Product[] }>(

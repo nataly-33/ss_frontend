@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { HeroCarousel } from "@modules/products/components/HeroCarousel";
 import { ProductCard } from "@modules/products/components/ProductCard";
-import { productsService } from "@modules/products/services/products.service";
-import type { Product } from "@modules/products/types";
+import { productsService } from "../services/products.service";
+import type { Product } from "../types";
 
 export const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);

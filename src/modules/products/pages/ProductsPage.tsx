@@ -3,8 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { Grid, List } from "lucide-react";
 import { ProductCard } from "@modules/products/components/ProductCard";
 import { ProductFilters } from "@modules/products/components/ProductFilters";
-import { productsService } from "@modules/products/services/products.service";
-import type { Product } from "@modules/products/types";
+import { productsService } from "../services/products.service";
+import type { Product } from "../types";
 
 export const ProductsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();

@@ -2,19 +2,61 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart } from "lucide-react";
 import { Card } from "@shared/components/ui/Card";
+import { useCartStore } from "@core/store/cart.store";
+import { useAuthStore } from "@core/store/auth.store";
 import type { Product } from "@modules/products/types";
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart?: (product: Product) => void;
-  onToggleFavorite?: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
-  product,
-  onAddToCart,
-  onToggleFavorite,
-}) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const { addItem } = useCartStore();
+  const { isAuthenticated } = useAuthStore();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!isAuthenticated) {
+      alert("Debes iniciar sesión para agregar al carrito");
+      return;
+    }
+
+    if (!product.tiene_stock) {
+      alert("Producto agotado");
+      return;
+    }
+
+    // Agregar con talla por defecto (primera disponible)
+    const defaultSize = product.tallas_disponibles_detalle?.[0];
+
+    if (!defaultSize) {
+      alert("No hay tallas disponibles");
+      return;
+    }
+
+    addItem({
+      id: `${product.id}-${defaultSize.id}`,
+      prenda: product,
+      talla: defaultSize,
+      cantidad: 1,
+    });
+
+    alert("Producto agregado al carrito");
+  };
+
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!isAuthenticated) {
+      alert("Debes iniciar sesión para agregar a favoritos");
+      return;
+    }
+
+    // Aquí irá la integración con el backend
+    alert("Agregado a favoritos");
+  };
+
   return (
     <Card hover className="group">
       <Link to={`/products/${product.slug}`} className="block">
@@ -34,7 +76,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               </span>
             )}
             {product.destacada && (
-              <span className="px-3 py-1 bg-accent-chocolate text-white text-xs font-medium rounded-full">
+              <span className="px-3 py-1 bg-neutral-800 text-white text-xs font-medium rounded-full">
                 Destacado
               </span>
             )}
@@ -43,20 +85,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {/* Actions */}
           <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                onToggleFavorite?.(product);
-              }}
+              onClick={handleToggleFavorite}
               className="p-2 bg-white rounded-full shadow-md hover:bg-primary-50 hover:text-primary-600 transition-colors"
+              title="Agregar a favoritos"
             >
               <Heart size={18} />
             </button>
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                onAddToCart?.(product);
-              }}
-              className="p-2 bg-white rounded-full shadow-md hover:bg-primary-50 hover:text-primary-600 transition-colors"
+              onClick={handleAddToCart}
+              disabled={!product.tiene_stock}
+              className="p-2 bg-white rounded-full shadow-md hover:bg-primary-50 hover:text-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Agregar al carrito"
             >
               <ShoppingCart size={18} />
             </button>

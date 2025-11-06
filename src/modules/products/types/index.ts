@@ -6,6 +6,7 @@ export interface Product {
   marca_nombre: string;
   color: string;
   slug: string;
+  tallas_disponibles_detalle: string;
   imagen_principal: string | null;
   stock_total: number;
   tiene_stock: boolean;

@@ -46,7 +46,7 @@ const slides: HeroSlide[] = [
 
 export const HeroCarousel: React.FC = () => {
   return (
-    <div className="relative w-full h-[70vh] bg-neutral-300">
+    <div className="relative w-full h-[60vh] md:h-[70vh] bg-neutral-100">
       <Swiper
         modules={[Autoplay, Pagination, Navigation, EffectFade]}
         effect="fade"
@@ -56,7 +56,10 @@ export const HeroCarousel: React.FC = () => {
         }}
         pagination={{
           clickable: true,
-          bulletActiveClass: "swiper-pagination-bullet-active bg-primary-500",
+          el: ".swiper-pagination-custom",
+          bulletClass:
+            "inline-block w-3 h-3 rounded-full bg-white/50 mx-1 cursor-pointer transition-all",
+          bulletActiveClass: "w-8 bg-white",
         }}
         navigation={{
           nextEl: ".swiper-button-next-custom",
@@ -68,33 +71,29 @@ export const HeroCarousel: React.FC = () => {
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
             <div className="relative w-full h-full">
-              {/* Image */}
+              {/* Background Image */}
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
-                  backgroundImage: `url(${slide.image})`,
+                  backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.3)), url(${slide.image})`,
                 }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
-              </div>
+              />
 
-              {/* Content */}
-              <div className="relative h-full flex items-center">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="max-w-xl animate-fade-in">
-                    <h1 className="text-5xl md:text-6xl font-display font-bold text-white mb-4">
+              {/* Content Container - FIXED Z-INDEX */}
+              <div className="relative z-10 h-full flex items-center">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                  <div className="max-w-xl">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 leading-tight">
                       {slide.title}
                     </h1>
-                    <p className="text-xl md:text-2xl text-white/90 mb-8">
+                    <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-8">
                       {slide.subtitle}
                     </p>
-
-                    <a
-                      href={slide.link}
-                      className="inline-block px-8 py-3 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors duration-200"
-                    >
-                      {slide.cta}
-                    </a>
+                    href={slide.link}
+                    className="inline-block px-8 py-3 bg-primary-500 text-white
+                    font-medium rounded-lg hover:bg-primary-600
+                    transition-colors duration-200 shadow-lg"
+                    <a>{slide.cta}</a>
                   </div>
                 </div>
               </div>
@@ -102,19 +101,22 @@ export const HeroCarousel: React.FC = () => {
           </SwiperSlide>
         ))}
 
-        {/* Custom Navigation */}
-        <button className="swiper-button-prev-custom absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 bg-white/80 rounded-full hover:bg-white transition-all duration-200 group">
+        {/* Custom Navigation Buttons - FIXED Z-INDEX */}
+        <button className="swiper-button-prev-custom absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-200 group shadow-lg">
           <ChevronLeft
             className="text-neutral-800 group-hover:text-primary-600"
-            size={24}
+            size={20}
           />
         </button>
-        <button className="swiper-button-next-custom absolute right-4 top-1/2 -translate-y-1/2 z-10 p-3 bg-white/80 rounded-full hover:bg-white transition-all duration-200 group">
+        <button className="swiper-button-next-custom absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-200 group shadow-lg">
           <ChevronRight
             className="text-neutral-800 group-hover:text-primary-600"
-            size={24}
+            size={20}
           />
         </button>
+
+        {/* Custom Pagination - FIXED Z-INDEX */}
+        <div className="swiper-pagination-custom absolute bottom-6 left-0 right-0 z-20 flex justify-center"></div>
       </Swiper>
     </div>
   );
