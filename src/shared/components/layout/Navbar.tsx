@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingBag, User, Search, Menu, X, Heart } from "lucide-react";
-import { useAuthStore } from "@core/store/auth.store";
+import { useAuthStore } from "@/core/store/auth.store";
 import { useCartStore } from "@core/store/cart.store";
 
 export const Navbar: React.FC = () => {
@@ -18,12 +18,12 @@ export const Navbar: React.FC = () => {
   const cartItemsCount = items.reduce((sum, item) => sum + item.cantidad, 0);
 
   return (
-    <nav className="sticky top-0 z-50 bg-background-primary/95 backdrop-blur-sm border-b border-neutral-200">
+    <nav className="sticky top-0 z-50 bg-background-neutral-600 backdrop-blur-sm border-b border-neutral-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-display font-bold text-primary-600">
+            <span className="text-2xl font-display font-bold text-primary-50">
               SmartSales365
             </span>
           </Link>
@@ -32,19 +32,19 @@ export const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               to="/products"
-              className="text-neutral-700 hover:text-primary-600 transition-colors"
+              className="text-neutral-700 hover:text-primary-100 transition-colors"
             >
               Catálogo
             </Link>
             <Link
               to="/new-arrivals"
-              className="text-neutral-700 hover:text-primary-600 transition-colors"
+              className="text-neutral-700 hover:text-primary-900 transition-colors"
             >
               Novedades
             </Link>
             <Link
               to="/featured"
-              className="text-neutral-700 hover:text-primary-600 transition-colors"
+              className="text-neutral-700 hover:text-primary-900 transition-colors"
             >
               Destacados
             </Link>
@@ -53,7 +53,7 @@ export const Navbar: React.FC = () => {
           {/* Right Section */}
           <div className="hidden md:flex items-center space-x-4">
             {/* Search */}
-            <button className="p-2 text-neutral-700 hover:text-primary-600 transition-colors">
+            <button className="p-2 text-neutral-700 hover:text-primary-900 transition-colors">
               <Search size={20} />
             </button>
 
@@ -62,7 +62,7 @@ export const Navbar: React.FC = () => {
                 {/* Favorites */}
                 <Link
                   to="/favorites"
-                  className="p-2 text-neutral-700 hover:text-primary-600 transition-colors"
+                  className="p-2 text-neutral-700 hover:text-primary-900 transition-colors"
                 >
                   <Heart size={20} />
                 </Link>
@@ -70,7 +70,7 @@ export const Navbar: React.FC = () => {
                 {/* Cart */}
                 <Link
                   to="/cart"
-                  className="relative p-2 text-neutral-700 hover:text-primary-600 transition-colors"
+                  className="relative p-2 text-neutral-700 hover:text-primary-900 transition-colors"
                 >
                   <ShoppingBag size={20} />
                   {cartItemsCount > 0 && (
