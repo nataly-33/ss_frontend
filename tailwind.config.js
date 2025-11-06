@@ -4,45 +4,47 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Strawberry Kiss Palette
+        // Paleta Rosita + Café
         primary: {
-          200: "#fad0d9",
-          300: "#f7a8b8",
-          400: "#f27591",
-          500: "#e94d6f",
-          600: "#d42d5d",
-          700: "#b2204e",
-          800: "#941d47",
-          900: "#7e1c42",
+          50: "#fdf2f8",
+          100: "#fce7f3",
+          200: "#fbcfe8",
+          300: "#f9a8d4",
+          400: "#f472b6",
+          500: "#ec4899",
+          600: "#db2777",
+          700: "#be185d",
+          800: "#9d174d",
+          900: "#831843",
         },
         neutral: {
-          50: "#faf9f8",
-          100: "#f5f3f1",
-          200: "#e8e5e1",
-          300: "#d2bdab",
-          400: "#cfa195",
-          500: "#a59383",
-          600: "#87564b",
-          700: "#6d3222",
-          800: "#5a2a1d",
-          900: "#4a2318",
+          50: "#fafaf9",
+          100: "#f5f5f4",
+          200: "#e7e5e4",
+          300: "#d6d3d1",
+          400: "#a8a29e",
+          500: "#78716c",
+          600: "#57534e",
+          700: "#44403c",
+          800: "#292524",
+          900: "#1c1917",
         },
-        // Semantic tokens used across the app
+        // Semantic tokens
         background: {
-          // maps to neutral.50
-          primary: "#faf9f8",
+          DEFAULT: "#fdf2f8",
+          dark: "#1c1917",
         },
         text: {
-          // maps to neutral.900 (dark text)
-          primary: "#4a2318",
+          DEFAULT: "#1c1917",
+          light: "#78716c",
         },
-        // generic border color token used with `border-border`
-        border: "#e8e5e1",
-        cream: "#E2B8AD",
-        rose: "#CFA195",
-        mauve: "#87564B",
-        chocolate: "#6D3222",
-        accent: "#A59383",
+        border: {
+          DEFAULT: "#e7e5e4",
+        },
+        accent: {
+          rose: "#f9a8d4",
+          cafe: "#78716c",
+        },
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
