@@ -1,7 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { MainLayout } from "@shared/components/layout/MainLayout";
+import { MainLayout } from "@/shared/components/layout/MainLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { AdminRoute } from "./AdminRoute";
 
 // Auth Pages
 import { LoginPage } from "@modules/auth/pages/LoginPage";
@@ -10,15 +11,23 @@ import { RegisterPage } from "@modules/auth/pages/RegisterPage";
 // Public Pages
 import { HomePage } from "@modules/products/pages/HomePage";
 import { ProductsPage } from "@modules/products/pages/ProductsPage";
-import { ProductDetailPage } from "@modules/products/pages/ProductDetailPage";
+import { ProductDetailPage } from "@/modules/products/pages/ProductDetailPage";
 
 // Protected Pages
 import { CartPage } from "@modules/cart/pages/CartPage";
-import { CheckoutPage } from "@modules/checkout/pages/CheckoutPage";
+import { CheckoutPage } from "@/modules/checkout/pages/CheckoutPage";
 import { ProfilePage } from "@modules/customers/pages/ProfilePage";
 import { OrdersPage } from "@modules/orders/pages/OrdersPage";
-import { OrderDetailPage } from "@modules/orders/pages/OrderDetailPage";
+import { OrderDetailPage } from "@/modules/orders/pages/OrderDetailPage";
 import { FavoritesPage } from "@modules/customers/pages/FavoritesPage";
+
+// Admin Pages
+import { AdminDashboard } from "@modules/dashboard/pages/AdminDashboard";
+//import { DashboardOverview } from "@modules/dashboard/pages/DashboardOverview";
+import { UsersManagement } from "@/modules/dashboard/pages/UsersManagment";
+import { ProductsManagement } from "@modules/dashboard/pages/ProductsManagement";
+import { CategoriesManagement } from "@modules/dashboard/pages/CategoriesManagement";
+import { RolesManagement } from "@/modules/dashboard/pages/RolesManagment";
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -27,6 +36,17 @@ export const AppRoutes: React.FC = () => {
         {/* Auth Routes (No Layout) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+
+        {/* Admin Routes */}
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminDashboard />}>
+            {/*<Route index element={<DashboardOverview />} />*/}
+            <Route path="users" element={<UsersManagement />} />
+            <Route path="roles" element={<RolesManagement />} />
+            <Route path="products" element={<ProductsManagement />} />
+            <Route path="categories" element={<CategoriesManagement />} />
+          </Route>
+        </Route>
 
         {/* Public Routes (With Layout) */}
         <Route element={<MainLayout />}>
