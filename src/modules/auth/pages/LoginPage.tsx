@@ -30,7 +30,14 @@ export const LoginPage: React.FC = () => {
         formData.password
       );
       login(response.user, response.access, response.refresh);
-      navigate("/");
+
+      // Redirigir según el rol del usuario
+      const rol = response.user.rol_detalle?.nombre;
+      if (rol === "Admin" || rol === "Empleado") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err: any) {
       setError(err.response?.data?.detail || "Error al iniciar sesión");
     } finally {
