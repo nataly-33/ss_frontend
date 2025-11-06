@@ -1,48 +1,57 @@
 import api from "@core/config/api.config";
-import type { Product, Category, Brand } from "../types";
-export const productsService = {
-  async getProducts(params?: any) {
-    const response = await api.get<{ results: Product[] }>(
-      "/products/prendas/",
-      { params }
-    );
-    return response.data.results;
-  },
+import { ENDPOINTS } from "@/core/config/endpoints";
+import type { 
+  Product, 
+  Category, 
+  Brand,
+  ProductsResponse,
+  ProductFilters 
+} from "../types";
 
-  async getProduct(slug: string) {
-    const response = await api.get<Product>(`/products/prendas/${slug}/`);
+export const productsService = {
+  async getProducts(params?: ProductFilters): Promise<ProductsResponse> {
+    const response = await api.get<ProductsResponse>(ENDPOINTS.PRODUCTS.BASE, { 
+      params 
+    });
     return response.data;
   },
 
-  async getFeatured() {
-    const response = await api.get<{ results: Product[] }>(
-      "/products/prendas/destacadas/"
-    );
+  async getProduct(slug: string): Promise<Product> {
+    const response = await api.get<Product>(ENDPOINTS.PRODUCTS.BY_SLUG(slug));
+    return response.data;
+  },
+
+  async getFeatured(): Promise<Product[]> {
+    const response = await api.get<ProductsResponse>(ENDPOINTS.PRODUCTS.BASE, {
+      params: { destacada: true }
+    });
     return response.data.results;
   },
 
-  async getNewArrivals() {
-    const response = await api.get<{ results: Product[] }>(
-      "/products/prendas/novedades/"
-    );
+  async getNewArrivals(): Promise<Product[]> {
+    const response = await api.get<ProductsResponse>(ENDPOINTS.PRODUCTS.BASE, {
+      params: { es_novedad: true }
+    });
     return response.data.results;
   },
 
-  async getCategories() {
+  async getCategories(): Promise<Category[]> {
     const response = await api.get<{ results: Category[] }>(
-      "/products/categorias/"
+      ENDPOINTS.PRODUCTS.CATEGORIES
     );
     return response.data.results;
   },
 
-  async getBrands() {
-    const response = await api.get<{ results: Brand[] }>("/products/marcas/");
+  async getBrands(): Promise<Brand[]> {
+    const response = await api.get<{ results: Brand[] }>(
+      ENDPOINTS.PRODUCTS.BRANDS
+    );
     return response.data.results;
   },
 
-  async search(query: string) {
-    const response = await api.get<{ results: Product[] }>(
-      "/products/prendas/",
+  async search(query: string): Promise<Product[]> {
+    const response = await api.get<ProductsResponse>(
+      ENDPOINTS.PRODUCTS.SEARCH,
       {
         params: { search: query },
       }

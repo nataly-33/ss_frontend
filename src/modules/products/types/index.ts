@@ -1,3 +1,9 @@
+export interface Size {
+  id: string;
+  nombre: string;
+  orden: number;
+}
+
 export interface Product {
   id: string;
   nombre: string;
@@ -6,7 +12,7 @@ export interface Product {
   marca_nombre: string;
   color: string;
   slug: string;
-  tallas_disponibles_detalle: string;
+  tallas_disponibles_detalle: Size[];
   imagen_principal: string | null;
   stock_total: number;
   tiene_stock: boolean;
@@ -38,4 +44,21 @@ export interface Size {
   id: string;
   nombre: string;
   orden: number;
+}
+
+export interface ProductsResponse {
+  results: Product[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+}
+
+export interface ProductFilters {
+  search?: string;
+  categoria?: string;
+  marca?: string;
+  precio_min?: number;
+  precio_max?: number;
+  ordering?: string;
+  page?: number;
 }

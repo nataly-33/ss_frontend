@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart } from "lucide-react";
-import { Card } from "@shared/components/ui/Card";
 import { useCartStore } from "@core/store/cart.store";
 import { useAuthStore } from "@core/store/auth.store";
+import { PUBLIC_ROUTES } from "@/core/config/routes";
 import type { Product } from "@modules/products/types";
 
 interface ProductCardProps {
@@ -27,22 +27,33 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       return;
     }
 
-    // Agregar con talla por defecto (primera disponible)
-    const defaultSize = product.tallas_disponibles_detalle?.[0];
-
-    if (!defaultSize) {
-      alert("No hay tallas disponibles");
+    // Verificar que el producto tenga tallas disponibles
+    if (!product.tallas_disponibles_detalle || product.tallas_disponibles_detalle.length === 0) {
+      alert("No hay tallas disponibles para este producto");
       return;
     }
 
+    // Usar la primera talla disponible por defecto
+    const defaultSize = product.tallas_disponibles_detalle[0];
+
     addItem({
       id: `${product.id}-${defaultSize.id}`,
-      prenda: product,
-      talla: defaultSize,
+      prenda: {
+        id: product.id,
+        nombre: product.nombre,
+        slug: product.slug,
+        precio: product.precio,
+        imagen_principal: product.imagen_principal || undefined,
+      },
+      talla: {
+        id: defaultSize.id,
+        nombre: defaultSize.nombre,
+      },
       cantidad: 1,
+      subtotal: product.precio,
     });
 
-    alert("Producto agregado al carrito");
+    alert(`Agregado al carrito: ${product.nombre} - Talla ${defaultSize.nombre}`);
   };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
@@ -58,69 +69,80 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <Card hover className="group">
-      <Link to={`/products/${product.slug}`} className="block">
+    <div className="group">
+      <Link 
+        to={PUBLIC_ROUTES.PRODUCT_DETAIL(product.slug)} 
+        className="block bg-white overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+        style={{
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 15px rgba(0, 0, 0, 0.1)',
+        }}
+      >
         {/* Image */}
-        <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
+        <div className="relative aspect-[3/4] overflow-hidden bg-neutral-light">
           <img
             src={product.imagen_principal || "/images/placeholder.jpg"}
             alt={product.nombre}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            style={{
+              filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))',
+            }}
           />
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {product.es_novedad && (
-              <span className="px-3 py-1 bg-primary-500 text-white text-xs font-medium rounded-full">
+              <span className="px-3 py-1.5 bg-accent-chocolate text-white text-xs font-semibold shadow-lg">
                 Nuevo
               </span>
             )}
             {product.destacada && (
-              <span className="px-3 py-1 bg-neutral-800 text-white text-xs font-medium rounded-full">
+              <span className="px-3 py-1.5 bg-accent-mauve text-white text-xs font-semibold shadow-lg">
                 Destacado
               </span>
             )}
           </div>
 
           {/* Actions */}
-          <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <button
               onClick={handleToggleFavorite}
-              className="p-2 bg-white rounded-full shadow-md hover:bg-primary-50 hover:text-primary-600 transition-colors"
+              className="p-2.5 bg-white shadow-lg hover:bg-accent-cream hover:text-accent-chocolate transition-all duration-200 hover:scale-110"
               title="Agregar a favoritos"
             >
-              <Heart size={18} />
+              <Heart size={20} />
             </button>
             <button
               onClick={handleAddToCart}
               disabled={!product.tiene_stock}
-              className="p-2 bg-white rounded-full shadow-md hover:bg-primary-50 hover:text-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2.5 bg-white shadow-lg hover:bg-accent-cream hover:text-accent-chocolate transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Agregar al carrito"
             >
-              <ShoppingCart size={18} />
+              <ShoppingCart size={20} />
             </button>
           </div>
         </div>
 
         {/* Info */}
-        <div className="p-4">
-          <p className="text-xs text-neutral-500 uppercase tracking-wide mb-1">
+        <div className="p-5 bg-white">
+          <p className="text-xs text-text-muted uppercase tracking-wider mb-1.5 font-semibold">
             {product.marca_nombre}
           </p>
-          <h3 className="text-sm font-medium text-neutral-900 mb-1 line-clamp-2">
+          <h3 className="text-base font-semibold text-text-important mb-1.5 line-clamp-2 group-hover:text-accent-chocolate transition-colors">
             {product.nombre}
           </h3>
-          <p className="text-sm text-neutral-600 mb-2">{product.color}</p>
+          <p className="text-sm text-text-secondary mb-3">{product.color}</p>
           <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold text-primary-600">
+            <span className="text-xl font-bold text-accent-chocolate">
               ${product.precio}
             </span>
             {!product.tiene_stock && (
-              <span className="text-xs text-red-600 font-medium">Agotado</span>
+              <span className="text-xs text-error font-semibold bg-error/10 px-2 py-1">
+                Agotado
+              </span>
             )}
           </div>
         </div>
       </Link>
-    </Card>
+    </div>
   );
 };
