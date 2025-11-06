@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Input } from "@shared/components/ui/Input";
 import { Button } from "@shared/components/ui/Button";
-import { useAuthStore } from "@core/store/auth.store";
-import { authService } from "@modules/auth/services/auth.service";
+import { useAuthStore } from "@/core/store/auth.store";
+import { authService } from "../services/auth.service";
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
