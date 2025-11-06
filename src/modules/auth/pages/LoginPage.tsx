@@ -1,176 +1,177 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { Input } from "@shared/components/ui/Input";
-import { Button } from "@shared/components/ui/Button";
-import { useAuthStore } from "@/core/store/auth.store";
+import { Eye, EyeOff, LogIn } from "lucide-react";
+import { useAuthStore } from "@core/store/auth.store";
 import { authService } from "../services/auth.service";
+import { PUBLIC_ROUTES } from "@/core/config/routes";
+import { Button } from "@shared/components/ui/Button";
+import { Input } from "@shared/components/ui/Input";
 
-export const LoginPage: React.FC = () => {
+export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuthStore();
-
+  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    setError("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
+    setIsLoading(true);
 
     try {
-      const response = await authService.login(
-        formData.email,
-        formData.password
-      );
+      const response = await authService.login(formData);
       login(response.user, response.access, response.refresh);
-
+      
       // Redirigir según el rol del usuario
-      const rol = response.user.rol_detalle?.nombre;
-      if (rol === "Admin" || rol === "Empleado") {
+      if (response.user.rol_detalle.nombre === "Admin" || response.user.rol_detalle.nombre === "Empleado") {
         navigate("/admin");
       } else {
-        navigate("/");
+        navigate(PUBLIC_ROUTES.HOME);
       }
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Error al iniciar sesión");
+      setError(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Credenciales inválidas. Por favor, intenta de nuevo."
+      );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background-primary flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-background-light via-background-main to-primary-light flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-display font-bold text-primary-600 mb-2">
-            SmartSales365
-          </h1>
-          <p className="text-neutral-600">Inicia sesión en tu cuenta</p>
-        </div>
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-main/10 rounded-full mb-4">
+              <LogIn className="w-8 h-8 text-primary-main" />
+            </div>
+            <h1 className="text-3xl font-display font-bold text-text-primary mb-2">
+              Bienvenido de nuevo
+            </h1>
+            <p className="text-text-secondary">
+              Inicia sesión para continuar
+            </p>
+          </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-2xl shadow-sm p-8">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600 text-center">{error}</p>
+            </div>
+          )}
+
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                {error}
-              </div>
-            )}
+            <Input
+              label="Correo electrónico"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="tu@email.com"
+              required
+              disabled={isLoading}
+              autoComplete="email"
+            />
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Correo Electrónico
-              </label>
-              <div className="relative">
-                <Mail
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                  size={20}
-                />
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
-                  placeholder="tu@email.com"
-                  required
-                />
-              </div>
+            <div className="relative">
+              <Input
+                label="Contraseña"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                required
+                disabled={isLoading}
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-[38px] text-text-secondary hover:text-text-primary transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                  size={20}
-                />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  className="w-full pl-10 pr-12 py-3 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
-                  placeholder="••••••••"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Remember & Forgot */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center cursor-pointer">
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+                  className="w-4 h-4 rounded border-neutral-light text-primary-main focus:ring-2 focus:ring-primary-main/50"
                 />
-                <span className="ml-2 text-sm text-neutral-700">
-                  Recordarme
-                </span>
+                <span className="text-text-secondary">Recordarme</span>
               </label>
               <Link
                 to="/forgot-password"
-                className="text-sm text-primary-600 hover:text-primary-700"
+                className="text-primary-main hover:text-accent-chocolate transition-colors font-medium"
               >
                 ¿Olvidaste tu contraseña?
               </Link>
             </div>
 
-            {/* Submit */}
             <Button
               type="submit"
               variant="primary"
-              size="lg"
               className="w-full"
-              disabled={loading}
+              size="lg"
+              isLoading={isLoading}
             >
-              {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
+              Iniciar sesión
             </Button>
           </form>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-neutral-500">o</span>
-            </div>
+          {/* Footer */}
+          <div className="mt-8 text-center">
+            <p className="text-text-secondary">
+              ¿No tienes una cuenta?{" "}
+              <Link
+                to={PUBLIC_ROUTES.REGISTER}
+                className="text-primary-main hover:text-accent-chocolate transition-colors font-semibold"
+              >
+                Regístrate aquí
+              </Link>
+            </p>
           </div>
-
-          {/* Register Link */}
-          <p className="text-center text-sm text-neutral-600">
-            ¿No tienes cuenta?{" "}
-            <Link
-              to="/register"
-              className="text-primary-600 hover:text-primary-700 font-medium"
-            >
-              Regístrate aquí
-            </Link>
-          </p>
         </div>
+
+        {/* Additional Info */}
+        <p className="text-center mt-6 text-sm text-text-secondary">
+          Al continuar, aceptas nuestros{" "}
+          <Link to="/terms" className="underline hover:text-text-primary">
+            Términos de Servicio
+          </Link>{" "}
+          y{" "}
+          <Link to="/privacy" className="underline hover:text-text-primary">
+            Política de Privacidad
+          </Link>
+        </p>
       </div>
     </div>
   );
-};
+}
+

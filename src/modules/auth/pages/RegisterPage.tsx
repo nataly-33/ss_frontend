@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react";
-import { Button } from "@shared/components/ui/Button";
+import { Eye, EyeOff, UserPlus, CheckCircle } from "lucide-react";
 import { authService } from "../services/auth.service";
+import { PUBLIC_ROUTES } from "@/core/config/routes";
+import { Button } from "@shared/components/ui/Button";
+import { Input } from "@shared/components/ui/Input";
 
-export const RegisterPage: React.FC = () => {
+export default function RegisterPage() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -17,257 +19,288 @@ export const RegisterPage: React.FC = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    setError("");
+  };
+
+  const validateForm = () => {
+    if (!formData.email || !formData.nombre || !formData.apellido || !formData.password) {
+      setError("Por favor, completa todos los campos requeridos");
+      return false;
+    }
+
+    if (formData.password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres");
+      return false;
+    }
+
+    if (formData.password !== formData.password_confirm) {
+      setError("Las contraseñas no coinciden");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Por favor, ingresa un correo electrónico válido");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (formData.password !== formData.password_confirm) {
-      setError("Las contraseñas no coinciden");
+    if (!validateForm()) {
       return;
     }
 
     setLoading(true);
 
     try {
-      await authService.register(formData);
+      await authService.register({
+        email: formData.email,
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        telefono: formData.telefono,
+        password: formData.password,
+        password_confirm: formData.password_confirm,
+      });
       setSuccess(true);
       setTimeout(() => {
-        navigate("/login");
+        navigate(PUBLIC_ROUTES.LOGIN);
       }, 2000);
     } catch (err: any) {
       const errors = err.response?.data;
       if (errors?.email) {
-        setError(errors.email[0]);
+        setError(errors.email[0] || "Este correo ya está registrado");
       } else if (errors?.password) {
-        setError(errors.password[0]);
+        setError(errors.password[0] || "La contraseña no es válida");
       } else {
-        setError("Error al registrarse. Intenta nuevamente.");
+        setError("Error al registrarse. Por favor, intenta nuevamente.");
       }
     } finally {
       setLoading(false);
     }
   };
 
+  // Success Screen
   if (success) {
     return (
-      <div className="min-h-screen bg-background-primary flex items-center justify-center px-4">
-        <div className="max-w-md w-full text-center">
-          <div className="bg-white rounded-2xl shadow-sm p-8">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-green-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
+      <div className="min-h-screen bg-gradient-to-br from-background-light via-background-main to-primary-light flex items-center justify-center px-4">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+              <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-neutral-900 mb-2">
+            <h2 className="text-3xl font-display font-bold text-text-primary mb-4">
               ¡Registro Exitoso!
             </h2>
-            <p className="text-neutral-600">
-              Redirigiendo al inicio de sesión...
+            <p className="text-text-secondary mb-6">
+              Tu cuenta ha sido creada correctamente. Redirigiendo al inicio de sesión...
             </p>
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-main"></div>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
+  // Register Form
   return (
-    <div className="min-h-screen bg-background-primary flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-display font-bold text-primary-600 mb-2">
-            SmartSales365
-          </h1>
-          <p className="text-neutral-600">Crea tu cuenta</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-background-light via-background-main to-primary-light flex items-center justify-center px-4 py-12">
+      <div className="max-w-2xl w-full">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-main/10 rounded-full mb-4">
+              <UserPlus className="w-8 h-8 text-primary-main" />
+            </div>
+            <h1 className="text-3xl font-display font-bold text-text-primary mb-2">
+              Crear cuenta
+            </h1>
+            <p className="text-text-secondary">
+              Únete a SmartSales y descubre moda única
+            </p>
+          </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-2xl shadow-sm p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                {error}
-              </div>
-            )}
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600 text-center">{error}</p>
+            </div>
+          )}
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Correo Electrónico
-              </label>
-              <div className="relative">
-                <Mail
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                  size={20}
-                />
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
-                  placeholder="tu@email.com"
-                  required
-                />
-              </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Nombre y Apellido - Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Nombre"
+                type="text"
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                placeholder="María"
+                required
+                disabled={loading}
+                autoComplete="given-name"
+              />
+
+              <Input
+                label="Apellido"
+                type="text"
+                name="apellido"
+                value={formData.apellido}
+                onChange={handleChange}
+                placeholder="García"
+                required
+                disabled={loading}
+                autoComplete="family-name"
+              />
             </div>
 
-            {/* Nombre y Apellido */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Nombre
-                </label>
-                <div className="relative">
-                  <User
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                    size={20}
-                  />
-                  <input
-                    type="text"
-                    value={formData.nombre}
-                    onChange={(e) =>
-                      setFormData({ ...formData, nombre: e.target.value })
-                    }
-                    className="w-full pl-10 pr-4 py-2.5 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Apellido
-                </label>
-                <input
-                  type="text"
-                  value={formData.apellido}
-                  onChange={(e) =>
-                    setFormData({ ...formData, apellido: e.target.value })
-                  }
-                  className="w-full px-4 py-2.5 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
-                  required
-                />
-              </div>
+            {/* Email y Teléfono - Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Correo electrónico"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="tu@email.com"
+                required
+                disabled={loading}
+                autoComplete="email"
+              />
+
+              <Input
+                label="Teléfono"
+                type="tel"
+                name="telefono"
+                value={formData.telefono}
+                onChange={handleChange}
+                placeholder="+591 75123456"
+                disabled={loading}
+                autoComplete="tel"
+                helperText="Opcional"
+              />
             </div>
 
-            {/* Teléfono */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Teléfono
-              </label>
+            {/* Contraseñas - Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="relative">
-                <Phone
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                  size={20}
-                />
-                <input
-                  type="tel"
-                  value={formData.telefono}
-                  onChange={(e) =>
-                    setFormData({ ...formData, telefono: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
-                  placeholder="+591 70000000"
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                  size={20}
-                />
-                <input
+                <Input
+                  label="Contraseña"
                   type={showPassword ? "text" : "password"}
+                  name="password"
                   value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  className="w-full pl-10 pr-12 py-2.5 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  onChange={handleChange}
                   placeholder="••••••••"
                   required
-                  minLength={8}
+                  disabled={loading}
+                  autoComplete="new-password"
+                  helperText="Mínimo 8 caracteres"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  className="absolute right-3 top-[38px] text-text-secondary hover:text-text-primary transition-colors"
+                  tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+
+              <div className="relative">
+                <Input
+                  label="Confirmar contraseña"
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="password_confirm"
+                  value={formData.password_confirm}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  required
+                  disabled={loading}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-[38px] text-text-secondary hover:text-text-primary transition-colors"
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
 
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Confirmar Contraseña
+            {/* Términos y Condiciones */}
+            <div className="flex items-start space-x-2">
+              <input
+                type="checkbox"
+                required
+                className="w-4 h-4 mt-1 rounded border-neutral-light text-primary-main focus:ring-2 focus:ring-primary-main/50"
+              />
+              <label className="text-sm text-text-secondary">
+                Acepto los{" "}
+                <Link to="/terms" className="text-primary-main hover:text-accent-chocolate underline">
+                  Términos de Servicio
+                </Link>{" "}
+                y la{" "}
+                <Link to="/privacy" className="text-primary-main hover:text-accent-chocolate underline">
+                  Política de Privacidad
+                </Link>
               </label>
-              <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                  size={20}
-                />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password_confirm}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      password_confirm: e.target.value,
-                    })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
             </div>
 
-            {/* Submit */}
+            {/* Submit Button */}
             <Button
               type="submit"
               variant="primary"
-              size="lg"
               className="w-full"
-              disabled={loading}
+              size="lg"
+              isLoading={loading}
             >
-              {loading ? "Registrando..." : "Crear Cuenta"}
+              Crear cuenta
             </Button>
           </form>
 
-          {/* Login Link */}
-          <p className="mt-6 text-center text-sm text-neutral-600">
-            ¿Ya tienes cuenta?{" "}
-            <Link
-              to="/login"
-              className="text-primary-600 hover:text-primary-700 font-medium"
-            >
-              Inicia sesión aquí
-            </Link>
-          </p>
+          {/* Footer */}
+          <div className="mt-8 text-center">
+            <p className="text-text-secondary">
+              ¿Ya tienes una cuenta?{" "}
+              <Link
+                to={PUBLIC_ROUTES.LOGIN}
+                className="text-primary-main hover:text-accent-chocolate transition-colors font-semibold"
+              >
+                Inicia sesión
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
-};
+}
