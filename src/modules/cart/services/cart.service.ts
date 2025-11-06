@@ -1,59 +1,34 @@
 import api from "@core/config/api.config";
-
-export interface CartItem {
-  id: string;
-  prenda: {
-    id: string;
-    nombre: string;
-    slug: string;
-    precio: number;
-    imagen_principal?: string;
-  };
-  talla: {
-    id: string;
-    nombre: string;
-  };
-  cantidad: number;
-  subtotal: number;
-}
-
-export interface Cart {
-  id: string;
-  usuario: string;
-  items: CartItem[];
-  total: number;
-  cantidad_items: number;
-}
+import { ENDPOINTS } from "@/core/config/endpoints";
+import type { Cart, AddToCartRequest, UpdateCartItemRequest } from "../types";
 
 export const cartService = {
   async getCart(): Promise<Cart> {
-    const response = await api.get<Cart>("/cart/");
+    const response = await api.get<Cart>(ENDPOINTS.CART.BASE);
     return response.data;
   },
 
-  async addItem(prendaId: string, tallaId: string, cantidad: number = 1) {
-    const response = await api.post("/cart/add/", {
-      prenda_id: prendaId,
-      talla_id: tallaId,
-      cantidad,
-    });
+  async addItem(data: AddToCartRequest): Promise<Cart> {
+    const response = await api.post<Cart>(ENDPOINTS.CART.ADD_ITEM, data);
     return response.data;
   },
 
-  async updateItem(itemId: string, cantidad: number) {
-    const response = await api.patch(`/cart/${itemId}/update-item/`, {
-      cantidad,
-    });
+  async updateItem(itemId: string, data: UpdateCartItemRequest): Promise<Cart> {
+    const response = await api.patch<Cart>(
+      ENDPOINTS.CART.UPDATE_ITEM(itemId), 
+      data
+    );
     return response.data;
   },
 
-  async removeItem(itemId: string) {
-    const response = await api.delete(`/cart/${itemId}/remove-item/`);
+  async removeItem(itemId: string): Promise<Cart> {
+    const response = await api.delete<Cart>(
+      ENDPOINTS.CART.REMOVE_ITEM(itemId)
+    );
     return response.data;
   },
 
-  async clearCart(cartId: string) {
-    const response = await api.delete(`/cart/${cartId}/clear/`);
-    return response.data;
+  async clearCart(): Promise<void> {
+    await api.delete(ENDPOINTS.CART.CLEAR);
   },
 };
