@@ -49,7 +49,7 @@ export const HomePage: React.FC = () => {
                 to={`/products?category=${category.id}`}
                 className="group"
               >
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-neutral-100">
+                <div className="relative aspect-square overflow-hidden bg-neutral-100">
                   <img
                     src={category.image}
                     alt={category.name}
@@ -88,7 +88,7 @@ export const HomePage: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="aspect-[3/4] bg-neutral-200 rounded-xl mb-4" />
+                  <div className="aspect-[3/4] bg-neutral-200 rounded-2xl mb-4" />
                   <div className="h-4 bg-neutral-200 rounded mb-2" />
                   <div className="h-4 bg-neutral-200 rounded w-2/3" />
                 </div>

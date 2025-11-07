@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart } from "lucide-react";
-import { useCartStore } from "@core/store/cart.store";
+// removed local cart store usage here; we use backend cartService when authenticated
+import { cartService } from "@modules/cart/services/cart.service";
 import { useAuthStore } from "@core/store/auth.store";
 import { PUBLIC_ROUTES } from "@/core/config/routes";
 import type { Product } from "@modules/products/types";
@@ -11,10 +12,9 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addItem } = useCartStore();
   const { isAuthenticated } = useAuthStore();
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
 
     if (!isAuthenticated) {
@@ -36,24 +36,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     // Usar la primera talla disponible por defecto
     const defaultSize = product.tallas_disponibles_detalle[0];
 
-    addItem({
-      id: `${product.id}-${defaultSize.id}`,
-      prenda: {
-        id: product.id,
-        nombre: product.nombre,
-        slug: product.slug,
-        precio: product.precio,
-        imagen_principal: product.imagen_principal || undefined,
-      },
-      talla: {
-        id: defaultSize.id,
-        nombre: defaultSize.nombre,
-      },
-      cantidad: 1,
-      subtotal: product.precio,
-    });
-
-    alert(`Agregado al carrito: ${product.nombre} - Talla ${defaultSize.nombre}`);
+    // Add to backend cart
+    try {
+      await cartService.addItem({ prenda_id: product.id, talla_id: defaultSize.id, cantidad: 1 });
+      alert(`Agregado al carrito: ${product.nombre} - Talla ${defaultSize.nombre}`);
+    } catch (err: any) {
+      console.error("Error adding to cart:", err);
+      alert(err.response?.data?.error || "Error al agregar al carrito");
+    }
   };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
@@ -72,7 +62,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="group">
       <Link 
         to={PUBLIC_ROUTES.PRODUCT_DETAIL(product.slug)} 
-        className="block bg-white overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+        className="block bg-white overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 "
         style={{
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 15px rgba(0, 0, 0, 0.1)',
         }}

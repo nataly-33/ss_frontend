@@ -12,7 +12,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs, FreeMode } from "swiper/modules";
 import { Button } from "@shared/components/ui/Button";
 import { productsService } from "@modules/products/services/products.service";
-import { useCartStore } from "@core/store/cart.store";
+import { cartService } from "@modules/cart/services/cart.service";
 import { useAuthStore } from "@core/store/auth.store";
 import type { Product } from "@modules/products/types";
 
@@ -24,7 +24,6 @@ import "swiper/css/free-mode";
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { addItem } = useCartStore();
   const { isAuthenticated } = useAuthStore();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -52,7 +51,7 @@ export const ProductDetailPage: React.FC = () => {
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!selectedSize) {
       alert("Por favor selecciona una talla");
       return;
@@ -68,13 +67,17 @@ export const ProductDetailPage: React.FC = () => {
         (t: any) => t.id === selectedSize
       );
       if (talla) {
-        addItem({
-          id: `${product.id}-${selectedSize}`,
-          prenda: product,
-          talla: talla,
-          cantidad: quantity,
-        });
-        alert("Producto agregado al carrito");
+        try {
+          await cartService.addItem({ 
+            prenda_id: product.id, 
+            talla_id: selectedSize, 
+            cantidad: quantity 
+          });
+          alert("Producto agregado al carrito");
+        } catch (err: any) {
+          console.error("Error adding to cart:", err);
+          alert(err.response?.data?.error || "Error al agregar al carrito");
+        }
       }
     }
   };

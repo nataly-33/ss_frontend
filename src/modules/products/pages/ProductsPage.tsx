@@ -67,8 +67,9 @@ export const ProductsPage: React.FC = () => {
         new: searchParams.get("new"),
       };
 
-      const data = await productsService.getProducts(params);
-      setProducts(data);
+  const data = await productsService.getProducts(params);
+  
+  setProducts(data.results ?? []);
     } catch (error) {
       console.error("Error loading products:", error);
     } finally {

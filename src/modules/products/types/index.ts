@@ -9,10 +9,14 @@ export interface Product {
   nombre: string;
   descripcion: string;
   precio: number;
-  marca_nombre: string;
+  marca_nombre?: string;
+  marca_detalle?: Brand;
+  categorias_detalle?: Category[];
   color: string;
+  material?: string;
   slug: string;
   tallas_disponibles_detalle: Size[];
+  imagenes?: Array<{ id: string; imagen: string; es_principal: boolean; orden: number }>;
   imagen_principal: string | null;
   stock_total: number;
   tiene_stock: boolean;
