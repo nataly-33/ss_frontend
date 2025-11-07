@@ -80,18 +80,21 @@ export function CheckoutPage() {
     setError("");
 
     try {
+      const selectedMethod = paymentMethods.find(m => m.id === selectedPaymentMethodId);
+      if (!selectedMethod) {
+        throw new Error("Método de pago no válido");
+      }
+
       const orderData = {
         direccion_envio_id: selectedAddressId,
-        metodo_pago_id: selectedPaymentMethodId,
-        notas: notes || undefined,
+        metodo_pago: selectedMethod.codigo as 'efectivo' | 'tarjeta' | 'paypal' | 'billetera',
+        notas_cliente: notes || undefined,
       };
 
-      const order = await ordersService.createOrder(orderData);
+      const order = await ordersService.checkout(orderData);
 
-      // Clear cart
       await cartService.clearCart();
 
-      // Redirect to order detail
       navigate(`/orders/${order.id}`);
       
     } catch (err: any) {
