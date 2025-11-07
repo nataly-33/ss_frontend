@@ -1,9 +1,5 @@
 import type { Product, Size } from "@modules/products/types";
 
-/**
- * Tipos e interfaces para el módulo de carrito de compras
- */
-
 export interface CartItem {
   id: string;
   prenda: {

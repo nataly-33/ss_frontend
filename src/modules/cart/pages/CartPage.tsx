@@ -89,7 +89,7 @@ export default function CartPage() {
     );
   }
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || (cart.items?.length ?? 0) === 0) {
     return (
       <div className="min-h-screen bg-background-main py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
