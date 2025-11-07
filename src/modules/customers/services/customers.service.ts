@@ -11,7 +11,6 @@ import type {
 } from "../types";
 
 export const customersService = {
-  // Profile
   async getProfile(): Promise<CustomerProfile> {
     const response = await api.get<CustomerProfile>(ENDPOINTS.CUSTOMERS.PROFILE);
     return response.data;
@@ -19,13 +18,12 @@ export const customersService = {
 
   async updateProfile(data: UpdateProfileData): Promise<CustomerProfile> {
     const response = await api.patch<CustomerProfile>(
-      ENDPOINTS.CUSTOMERS.UPDATE_PROFILE, 
+      ENDPOINTS.CUSTOMERS.PROFILE, 
       data
     );
     return response.data;
   },
 
-  // Addresses
   async getAddresses(): Promise<Address[]> {
     const response = await api.get<{ results: Address[] }>(
       ENDPOINTS.CUSTOMERS.ADDRESSES
@@ -56,7 +54,13 @@ export const customersService = {
     await api.delete(ENDPOINTS.CUSTOMERS.ADDRESS_BY_ID(addressId));
   },
 
-  // Favorites
+  async setPrincipalAddress(addressId: string): Promise<Address> {
+    const response = await api.post<Address>(
+      ENDPOINTS.CUSTOMERS.SET_MAIN_ADDRESS(addressId)
+    );
+    return response.data;
+  },
+
   async getFavorites(): Promise<Favorite[]> {
     const response = await api.get<{ results: Favorite[] }>(
       ENDPOINTS.CUSTOMERS.FAVORITES
@@ -64,21 +68,21 @@ export const customersService = {
     return response.data.results || response.data;
   },
 
-  async addFavorite(prendaId: string): Promise<Favorite> {
-    const response = await api.post<Favorite>(
-      ENDPOINTS.CUSTOMERS.ADD_FAVORITE,
+  async toggleFavorite(prendaId: string): Promise<{ message: string; agregado: boolean }> {
+    const response = await api.post<{ message: string; agregado: boolean }>(
+      ENDPOINTS.CUSTOMERS.TOGGLE_FAVORITE,
       { prenda_id: prendaId }
     );
     return response.data;
   },
 
-  async removeFavorite(productId: string): Promise<void> {
-    await api.delete(ENDPOINTS.CUSTOMERS.REMOVE_FAVORITE(productId));
+  async getWallet(): Promise<{ saldo: number; transacciones: any[] }> {
+    const response = await api.get<any>(ENDPOINTS.CUSTOMERS.WALLET);
+    return response.data;
   },
 
-  // Wallet
   async rechargeWallet(data: WalletRechargeData): Promise<any> {
-    const response = await api.post("/api/customers/wallet/recharge/", data);
+    const response = await api.post(ENDPOINTS.CUSTOMERS.WALLET_RECHARGE, data);
     return response.data;
   },
 };

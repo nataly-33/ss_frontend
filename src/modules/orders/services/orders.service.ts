@@ -4,12 +4,10 @@ import type {
   Order, 
   PaymentMethod, 
   CheckoutData, 
-  OrdersParams,
-  StripePaymentData 
+  OrdersParams
 } from "../types";
 
 export const ordersService = {
-  // Orders
   async getOrders(params?: OrdersParams): Promise<Order[]> {
     const response = await api.get<{ results: Order[] }>(
       ENDPOINTS.ORDERS.BASE, 
@@ -30,38 +28,31 @@ export const ordersService = {
     return response.data;
   },
 
-  async createOrder(data: CheckoutData): Promise<Order> {
-    const response = await api.post<Order>(ENDPOINTS.ORDERS.CREATE, data);
+  async checkout(data: CheckoutData): Promise<Order> {
+    const response = await api.post<Order>(ENDPOINTS.ORDERS.CHECKOUT, data);
     return response.data;
   },
 
-  async updateOrderStatus(orderId: string, estado: string): Promise<Order> {
-    const response = await api.patch<Order>(
-      ENDPOINTS.ORDERS.UPDATE_STATUS(orderId),
-      { estado }
-    );
-    return response.data;
-  },
-
-  async cancelOrder(orderId: string): Promise<Order> {
+  async updateOrderStatus(orderId: string, nuevo_estado: string, notas?: string): Promise<Order> {
     const response = await api.post<Order>(
-      ENDPOINTS.ORDERS.CANCEL(orderId)
+      ENDPOINTS.ORDERS.UPDATE_STATUS(orderId),
+      { nuevo_estado, notas }
     );
     return response.data;
   },
 
-  // Payment Methods
+  async cancelOrder(orderId: string, notas?: string): Promise<Order> {
+    const response = await api.post<Order>(
+      ENDPOINTS.ORDERS.CANCEL(orderId),
+      { notas }
+    );
+    return response.data;
+  },
+
   async getPaymentMethods(): Promise<PaymentMethod[]> {
-    // Este endpoint puede estar en ORDERS o crear uno nuevo
     const response = await api.get<{ results: PaymentMethod[] }>(
-      "/api/orders/metodos-pago/"
+      ENDPOINTS.ORDERS.PAYMENT_METHODS
     );
     return response.data.results || response.data;
-  },
-
-  // Stripe Payment
-  async processStripePayment(data: StripePaymentData): Promise<any> {
-    const response = await api.post("/api/orders/process-payment/", data);
-    return response.data;
   },
 };

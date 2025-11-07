@@ -47,7 +47,7 @@ export default function OrdersPage() {
     if (filters.fechaDesde) {
       const desde = new Date(filters.fechaDesde);
       filtered = filtered.filter(
-        (order) => new Date(order.fecha_creacion) >= desde
+        (order) => new Date(order.created_at) >= desde
       );
     }
 
@@ -56,7 +56,7 @@ export default function OrdersPage() {
       const hasta = new Date(filters.fechaHasta);
       hasta.setHours(23, 59, 59, 999); // End of day
       filtered = filtered.filter(
-        (order) => new Date(order.fecha_creacion) <= hasta
+        (order) => new Date(order.created_at) <= hasta
       );
     }
 
@@ -83,7 +83,7 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-background-main py-8">
       <div className="container-custom">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-start">
+        <div className="mb-8 flex justify-between items-start px-6">
           <div>
             <h1 className="text-4xl font-display font-bold text-text-primary mb-2">
               Mis Pedidos

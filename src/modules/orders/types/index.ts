@@ -21,39 +21,40 @@ export interface Order {
   usuario: {
     id: string;
     email: string;
-    first_name: string;
-    last_name: string;
+    nombre: string;
+    apellido: string;
   };
   items: OrderItem[];
   estado: string;
+  subtotal: number;
+  descuento: number;
+  costo_envio: number;
   total: number;
+  total_items: number;
+  puede_cancelar: boolean;
   direccion_envio: any;
-  metodo_pago: {
-    id: string;
-    nombre: string;
-    tipo: string;
-  };
-  fecha_creacion: string;
-  fecha_actualizacion: string;
+  direccion_snapshot?: any;
+  notas_cliente?: string;
+  notas_internas?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PaymentMethod {
   id: string;
+  codigo: string;
   nombre: string;
-  tipo: string;
-  activo: boolean;
   descripcion?: string;
+  activo: boolean;
+  requiere_procesador: boolean;
 }
 
 export interface CheckoutData {
   direccion_envio_id: string;
-  metodo_pago_id: string;
-  items?: {
-    prenda_id: string;
-    talla_id: string;
-    cantidad: number;
-  }[];
-  notas?: string;
+  metodo_pago: 'efectivo' | 'tarjeta' | 'paypal' | 'billetera';
+  notas_cliente?: string;
+  payment_method_id?: string;
+  paypal_order_id?: string;
 }
 
 export interface OrdersParams {

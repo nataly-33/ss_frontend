@@ -1,29 +1,35 @@
 export interface Address {
   id: string;
-  calle: string;
-  numero_exterior: string;
-  numero_interior?: string;
-  colonia: string;
+  nombre_completo: string;
+  telefono: string;
+  direccion_linea1: string;
+  direccion_linea2?: string;
   ciudad: string;
-  estado: string;
+  departamento: string;
   codigo_postal: string;
   pais: string;
+  referencia?: string;
   es_principal: boolean;
-  referencias?: string;
+  activa: boolean;
+  direccion_completa?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CustomerProfile {
   id: string;
-  usuario: {
-    id: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
+  email: string;
+  nombre: string;
+  apellido: string;
+  nombre_completo?: string;
   telefono?: string;
-  fecha_nacimiento?: string;
-  genero?: string;
+  foto_perfil?: string;
   saldo_billetera: number;
+  email_verificado: boolean;
+  direccion_principal?: Address;
+  total_compras: number;
+  total_favoritos: number;
+  created_at: string;
 }
 
 export interface Favorite {
@@ -35,7 +41,7 @@ export interface Favorite {
     precio: number;
     imagen_principal?: string;
   };
-  fecha_agregado: string;
+  created_at: string;
 }
 
 export interface CreateAddressData extends Omit<Address, "id"> {}
@@ -49,5 +55,6 @@ export interface AddFavoriteData {
 }
 
 export interface WalletRechargeData {
-  amount: number;
+  monto: number;
+  metodo_pago: 'tarjeta' | 'transferencia';
 }
