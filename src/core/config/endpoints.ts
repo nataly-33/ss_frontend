@@ -38,8 +38,8 @@ export const ENDPOINTS = {
     BASE: '/api/cart/',
     MY_CART: '/api/cart/mi_carrito/',
     ADD_ITEM: '/api/cart/agregar/',
-    UPDATE_ITEM: '/api/cart/actualizar_item/',
-    REMOVE_ITEM: '/api/cart/eliminar_item/',
+    UPDATE_ITEM: (id: string) => `/api/cart/items/${id}/actualizar/`,
+    REMOVE_ITEM: (id: string) => `/api/cart/items/${id}/eliminar/`,
     CLEAR: '/api/cart/limpiar/',
   },
 

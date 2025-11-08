@@ -21,6 +21,10 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
     onUpdateQuantity(item.id, item.cantidad + 1);
   };
 
+  // Ensure precio and subtotal are numbers
+  const precio = typeof item.prenda.precio === 'string' ? parseFloat(item.prenda.precio) : item.prenda.precio;
+  const subtotal = typeof item.subtotal === 'string' ? parseFloat(item.subtotal) : item.subtotal;
+
   return (
     <div className="flex gap-4 p-4 bg-white rounded-lg shadow-sm border border-neutral-light">
       {/* Image */}
@@ -44,7 +48,7 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
           Talla: <span className="font-medium">{item.talla.nombre}</span>
         </p>
         <p className="text-lg font-bold text-primary-main mt-2">
-          ${item.prenda.precio.toFixed(2)}
+          ${precio.toFixed(2)}
         </p>
       </div>
 
@@ -80,7 +84,7 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
         </div>
 
         <p className="text-sm font-bold text-text-primary mt-2">
-          ${item.subtotal.toFixed(2)}
+          ${subtotal.toFixed(2)}
         </p>
       </div>
     </div>

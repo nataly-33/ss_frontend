@@ -21,14 +21,14 @@ export const cartService = {
   },
 
   async updateItem(itemId: string, data: UpdateCartItemRequest): Promise<Cart> {
-    const payload = { item_id: itemId, cantidad: data.cantidad };
-    const response = await api.put<any>(ENDPOINTS.CART.UPDATE_ITEM, payload);
+    const payload = { cantidad: data.cantidad };
+    const response = await api.put<any>(ENDPOINTS.CART.UPDATE_ITEM(itemId), payload);
     const raw = response.data?.carrito ?? response.data;
     return normalizeCart(raw);
   },
 
   async removeItem(itemId: string): Promise<Cart> {
-    const response = await api.delete<any>(ENDPOINTS.CART.REMOVE_ITEM, { params: { item_id: itemId } });
+    const response = await api.delete<any>(ENDPOINTS.CART.REMOVE_ITEM(itemId));
     const raw = response.data?.carrito ?? response.data;
     return normalizeCart(raw);
   },
@@ -52,13 +52,16 @@ function normalizeCart(raw: any): Cart {
   const items = (raw.items || []).map((it: any) => {
     const prenda = it.prenda_detalle || {};
     const talla = it.talla_detalle || {};
+    // Ensure precio is always a number, not a string
+    const precio = typeof prenda.precio === 'string' ? parseFloat(prenda.precio) : (prenda.precio ?? 0);
+    const subtotal = typeof it.subtotal === 'string' ? parseFloat(it.subtotal) : (it.subtotal ?? 0);
     return {
       id: it.id,
       prenda: {
         id: prenda.id ?? "",
         nombre: prenda.nombre ?? "",
         slug: prenda.slug ?? "",
-        precio: prenda.precio ?? it.precio_unitario ?? 0,
+        precio: precio,
         imagen_principal: prenda.imagen_principal,
       },
       talla: {
@@ -66,15 +69,16 @@ function normalizeCart(raw: any): Cart {
         nombre: talla.nombre ?? "",
       },
       cantidad: it.cantidad ?? 0,
-      subtotal: it.subtotal ?? 0,
+      subtotal: subtotal,
     };
   });
 
+  const total = typeof raw.total === 'string' ? parseFloat(raw.total) : (raw.total ?? 0);
   return {
     id: raw.id ?? "",
     usuario: raw.usuario ?? "",
     items,
-    total: raw.total ?? 0,
+    total: total,
     cantidad_items: raw.total_items ?? items.reduce((s: number, i: any) => s + i.cantidad, 0),
   };
 }
