@@ -36,9 +36,12 @@ api.interceptors.response.use(
       if (refreshToken) {
         try {
           // Use central ENDPOINTS collection to construct the refresh URL.
-          const response = await axios.post(`${API_URL}${ENDPOINTS.AUTH.REFRESH}`, {
-            refresh: refreshToken,
-          });
+          const response = await axios.post(
+            `${API_URL}${ENDPOINTS.AUTH.REFRESH}`,
+            {
+              refresh: refreshToken,
+            }
+          );
 
           const { access } = response.data;
           localStorage.setItem("access_token", access);

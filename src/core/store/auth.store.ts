@@ -7,7 +7,6 @@ interface User {
   nombre: string;
   apellido: string;
   nombre_completo: string;
-  saldo_billetera?: number;
   rol_detalle?: {
     nombre: string;
     permisos?: Array<{
