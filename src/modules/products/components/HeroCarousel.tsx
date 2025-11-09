@@ -21,7 +21,7 @@ interface HeroSlide {
 const slides: HeroSlide[] = [
   {
     id: 1,
-    image: "/banners/fondo3.png",
+    image: "images/banners/fondo3.png",
     title: "Nueva Colección",
     subtitle: "Descubre las últimas tendencias",
     cta: "Explorar",
@@ -29,7 +29,7 @@ const slides: HeroSlide[] = [
   },
   {
     id: 2,
-    image: "/banners/fondo2.jpg",
+    image: "images/banners/fondo2.jpg",
     title: "Ofertas Especiales",
     subtitle: "Hasta 50% de descuento",
     cta: "Ver Ofertas",
@@ -37,7 +37,7 @@ const slides: HeroSlide[] = [
   },
   {
     id: 3,
-    image: "/banners/fondo1.jpg",
+    image: "images/banners/fondo1.jpg",
     title: "Estilo Único",
     subtitle: "Prendas exclusivas para ti",
     cta: "Comprar Ahora",
@@ -110,22 +110,16 @@ export const HeroCarousel: React.FC = () => {
 
         {/* Custom Navigation Buttons */}
         <button className="swiper-button-prev-custom absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 p-3 md:p-4 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white hover:scale-110 transition-all duration-300 group shadow-xl hover:shadow-2xl">
-          <ChevronLeft
-            className="text-accent-chocolate"
-            size={24}
-          />
+          <ChevronLeft className="text-accent-chocolate" size={24} />
         </button>
         <button className="swiper-button-next-custom absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 p-3 md:p-4 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white hover:scale-110 transition-all duration-300 group shadow-xl hover:shadow-2xl">
-          <ChevronRight
-            className="text-accent-chocolate"
-            size={24}
-          />
+          <ChevronRight className="text-accent-chocolate" size={24} />
         </button>
 
         {/* Custom Pagination */}
         <div className="swiper-pagination-custom absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-1"></div>
       </Swiper>
-      
+
       {/* CSS para animaciones personalizadas */}
       <style>{`
         .animate-fade-in {

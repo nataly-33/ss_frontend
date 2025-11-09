@@ -68,10 +68,10 @@ export const ProductDetailPage: React.FC = () => {
       );
       if (talla) {
         try {
-          await cartService.addItem({ 
-            prenda_id: product.id, 
-            talla_id: selectedSize, 
-            cantidad: quantity 
+          await cartService.addItem({
+            prenda_id: product.id,
+            talla_id: selectedSize,
+            cantidad: quantity,
           });
           alert("Producto agregado al carrito");
         } catch (err: any) {
@@ -291,22 +291,6 @@ export const ProductDetailPage: React.FC = () => {
                   />
                 </svg>
                 <span>Envío gratis en compras mayores a $100</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-neutral-700">
-                <svg
-                  className="w-5 h-5 text-primary-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span>Devoluciones gratis en 30 días</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-neutral-700">
                 <svg
