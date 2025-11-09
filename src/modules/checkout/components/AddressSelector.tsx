@@ -5,12 +5,14 @@ export function AddressSelector({
   selectedAddressId,
   onSelect,
   onCreateNew,
-  isLoading
+  isLoading,
 }: AddressSelectorProps) {
   if (addresses.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-text-secondary mb-4">No tienes direcciones guardadas</p>
+        <p className="text-text-secondary mb-4">
+          No tienes direcciones guardadas
+        </p>
         <button
           onClick={onCreateNew}
           className="text-primary-main hover:text-accent-chocolate font-semibold"
@@ -42,11 +44,12 @@ export function AddressSelector({
             key={address.id}
             className={`
               relative flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all
-              ${selectedAddressId === address.id
-                ? 'border-primary-main bg-primary-light'
-                : 'border-neutral-light hover:border-primary-main/50'
+              ${
+                selectedAddressId === address.id
+                  ? "border-primary-main bg-primary-light"
+                  : "border-neutral-light hover:border-primary-main/50"
               }
-              ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+              ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
             `}
           >
             <input
@@ -61,8 +64,8 @@ export function AddressSelector({
             <div className="ml-3 flex-1">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-text-primary">
-                  {address.calle} {address.numero_exterior}
-                  {address.numero_interior && ` - ${address.numero_interior}`}
+                  {address.direccion_linea1}
+                  {address.direccion_linea2 && ` - ${address.direccion_linea2}`}
                 </span>
                 {address.es_principal && (
                   <span className="px-2 py-0.5 text-xs bg-primary-main text-white rounded-full">
@@ -71,14 +74,14 @@ export function AddressSelector({
                 )}
               </div>
               <p className="text-sm text-text-secondary mt-1">
-                {address.colonia}, {address.ciudad}
+                {address.ciudad}
               </p>
               <p className="text-sm text-text-secondary">
-                {address.estado}, {address.codigo_postal}
+                {address.departamento}, {address.codigo_postal}
               </p>
-              {address.referencias && (
+              {address.referencia && (
                 <p className="text-xs text-text-secondary mt-2 italic">
-                  Ref: {address.referencias}
+                  Ref: {address.referencia}
                 </p>
               )}
             </div>

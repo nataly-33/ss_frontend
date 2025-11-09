@@ -79,7 +79,7 @@ export const ProductsManagement: React.FC = () => {
     try {
       setLoading(true);
       const response = await productsService.getAll({ search: searchTerm });
-      setProducts(response.results || response);
+      setProducts(Array.isArray(response) ? response : response.results || []);
     } catch (error) {
       console.error("Error loading products:", error);
     } finally {

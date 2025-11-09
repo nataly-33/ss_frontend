@@ -30,7 +30,10 @@ export const customersService = {
     const response = await api.get<{ results: Address[] }>(
       ENDPOINTS.CUSTOMERS.ADDRESSES
     );
-    return response.data.results || response.data;
+    return (
+      response.data.results ||
+      (Array.isArray(response.data) ? response.data : [])
+    );
   },
 
   async createAddress(data: CreateAddressData): Promise<Address> {
@@ -67,7 +70,10 @@ export const customersService = {
     const response = await api.get<{ results: Favorite[] }>(
       ENDPOINTS.CUSTOMERS.FAVORITES
     );
-    return response.data.results || response.data;
+    return (
+      response.data.results ||
+      (Array.isArray(response.data) ? response.data : [])
+    );
   },
 
   async toggleFavorite(

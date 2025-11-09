@@ -44,7 +44,7 @@ export const UsersManagement: React.FC = () => {
         usersService.getAll({ search: searchTerm }),
         rolesService.getAll(),
       ]);
-      setUsers(usersData.results || usersData);
+      setUsers(Array.isArray(usersData) ? usersData : usersData.results || []);
       setRoles(rolesData);
     } catch (error) {
       console.error("Error loading data:", error);

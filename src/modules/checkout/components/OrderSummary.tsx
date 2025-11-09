@@ -7,7 +7,7 @@ export function OrderSummary({
   notes,
   onNotesChange,
   onConfirm,
-  isProcessing
+  isProcessing,
 }: OrderSummaryProps) {
   const shipping = 0; // Envío gratuito
   const subtotal = cart.total;
@@ -54,11 +54,12 @@ export function OrderSummary({
             Dirección de envío
           </h4>
           <p className="text-sm text-text-secondary">
-            {selectedAddress.calle} {selectedAddress.numero_exterior}
-            {selectedAddress.numero_interior && ` - ${selectedAddress.numero_interior}`}
+            {selectedAddress.direccion_linea1}
+            {selectedAddress.direccion_linea2 &&
+              ` - ${selectedAddress.direccion_linea2}`}
           </p>
           <p className="text-sm text-text-secondary">
-            {selectedAddress.colonia}, {selectedAddress.ciudad}
+            {selectedAddress.ciudad}
           </p>
         </div>
       )}
@@ -69,7 +70,9 @@ export function OrderSummary({
           <h4 className="font-semibold text-text-primary text-sm mb-2">
             Método de pago
           </h4>
-          <p className="text-sm text-text-secondary">{selectedPaymentMethod.nombre}</p>
+          <p className="text-sm text-text-secondary">
+            {selectedPaymentMethod.nombre}
+          </p>
         </div>
       )}
 
@@ -99,7 +102,9 @@ export function OrderSummary({
           <span className="font-semibold text-green-600">Gratis</span>
         </div>
         <div className="flex justify-between items-center pt-3 border-t border-neutral-light">
-          <span className="text-lg font-display font-bold text-text-primary">Total</span>
+          <span className="text-lg font-display font-bold text-text-primary">
+            Total
+          </span>
           <span className="text-2xl font-display font-bold text-primary-main">
             ${total.toFixed(2)}
           </span>
@@ -112,9 +117,10 @@ export function OrderSummary({
         disabled={!canConfirm}
         className={`
           w-full py-3 px-4 rounded-lg font-semibold transition-all
-          ${canConfirm
-            ? 'bg-primary-main text-white hover:bg-accent-chocolate hover:shadow-lg'
-            : 'bg-neutral-light text-text-secondary cursor-not-allowed'
+          ${
+            canConfirm
+              ? "bg-primary-main text-white hover:bg-accent-chocolate hover:shadow-lg"
+              : "bg-neutral-light text-text-secondary cursor-not-allowed"
           }
         `}
       >
@@ -124,15 +130,15 @@ export function OrderSummary({
             Procesando...
           </span>
         ) : (
-          'Confirmar pedido'
+          "Confirmar pedido"
         )}
       </button>
 
       {!canConfirm && !isProcessing && (
         <p className="text-xs text-red-600 text-center mt-2">
-          {!selectedAddress && 'Selecciona una dirección de envío'}
-          {!selectedPaymentMethod && !selectedAddress && ' y '}
-          {!selectedPaymentMethod && 'Selecciona un método de pago'}
+          {!selectedAddress && "Selecciona una dirección de envío"}
+          {!selectedPaymentMethod && !selectedAddress && " y "}
+          {!selectedPaymentMethod && "Selecciona un método de pago"}
         </p>
       )}
     </div>

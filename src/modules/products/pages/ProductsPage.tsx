@@ -61,15 +61,14 @@ export const ProductsPage: React.FC = () => {
         brands: filters.brands.join(","),
         colors: filters.colors.join(","),
         sizes: filters.sizes.join(","),
-        precio_min: filters.priceMin,
-        precio_max: filters.priceMax,
+        precio_min: Number(filters.priceMin) || 0,
+        precio_max: Number(filters.priceMax) || 0,
         featured: searchParams.get("featured"),
         new: searchParams.get("new"),
-      };
+      } as any;
 
-  const data = await productsService.getProducts(params);
-  
-  setProducts(data.results ?? []);
+      const data = await productsService.getProducts(params);
+      setProducts(data.results ?? []);
     } catch (error) {
       console.error("Error loading products:", error);
     } finally {

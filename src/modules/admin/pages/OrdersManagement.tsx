@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Eye, Trash2, Package } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Trash2, Package } from "lucide-react";
 import { Button } from "@shared/components/ui/Button";
 import { ordersService } from "../services/admin.service";
 import type { Order } from "../types";
-import { PageHeader, SearchBar, StatusBadge } from "../components";
+import { PageHeader, SearchBar } from "../components";
 
 const ESTADOS_PEDIDO = [
   {
@@ -59,7 +59,7 @@ export const OrdersManagement: React.FC = () => {
         search: searchTerm,
         estado: filterEstado,
       });
-      setOrders(response.results || response);
+      setOrders(Array.isArray(response) ? response : response.results || []);
     } catch (error) {
       console.error("Error loading orders:", error);
     } finally {

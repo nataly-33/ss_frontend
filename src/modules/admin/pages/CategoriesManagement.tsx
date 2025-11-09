@@ -25,7 +25,9 @@ export const CategoriesManagement: React.FC = () => {
     try {
       setLoading(true);
       const response = await categoriesService.getAll();
-      setCategories(response.results || response);
+      setCategories(
+        Array.isArray(response) ? response : response.results || []
+      );
     } catch (error) {
       console.error("Error loading categories:", error);
     } finally {

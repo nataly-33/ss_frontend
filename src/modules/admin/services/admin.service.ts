@@ -215,12 +215,16 @@ export const productsService = {
       formData.append("nombre", data.nombre);
       formData.append("descripcion", data.descripcion);
       formData.append("precio", String(data.precio));
-      formData.append("marca_id", data.marca_id);
+      formData.append("marca", data.marca);
       formData.append("color", data.color);
 
-      data.categoria_ids.forEach((id) => formData.append("categoria_ids", id));
-      if (data.talla_ids) {
-        data.talla_ids.forEach((id) => formData.append("talla_ids", id));
+      data.categorias.forEach((id: string) =>
+        formData.append("categorias", id)
+      );
+      if (data.tallas_disponibles) {
+        data.tallas_disponibles.forEach((id: string) =>
+          formData.append("tallas_disponibles", id)
+        );
       }
       if (data.material) formData.append("material", data.material);
       if (data.activa !== undefined)

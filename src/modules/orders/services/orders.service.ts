@@ -1,26 +1,32 @@
 import api from "@core/config/api.config";
 import { ENDPOINTS } from "@/core/config/endpoints";
-import type { 
-  Order, 
-  PaymentMethod, 
-  CheckoutData, 
-  OrdersParams
+import type {
+  Order,
+  PaymentMethod,
+  CheckoutData,
+  OrdersParams,
 } from "../types";
 
 export const ordersService = {
   async getOrders(params?: OrdersParams): Promise<Order[]> {
     const response = await api.get<{ results: Order[] }>(
-      ENDPOINTS.ORDERS.BASE, 
+      ENDPOINTS.ORDERS.BASE,
       { params }
     );
-    return response.data.results || response.data;
+    return (
+      response.data.results ||
+      (Array.isArray(response.data) ? response.data : [])
+    );
   },
 
   async getMyOrders(): Promise<Order[]> {
     const response = await api.get<{ results: Order[] }>(
       ENDPOINTS.ORDERS.MY_ORDERS
     );
-    return response.data.results || response.data;
+    return (
+      response.data.results ||
+      (Array.isArray(response.data) ? response.data : [])
+    );
   },
 
   async getOrder(orderId: string): Promise<Order> {
@@ -33,7 +39,11 @@ export const ordersService = {
     return response.data;
   },
 
-  async updateOrderStatus(orderId: string, nuevo_estado: string, notas?: string): Promise<Order> {
+  async updateOrderStatus(
+    orderId: string,
+    nuevo_estado: string,
+    notas?: string
+  ): Promise<Order> {
     const response = await api.post<Order>(
       ENDPOINTS.ORDERS.UPDATE_STATUS(orderId),
       { nuevo_estado, notas }
@@ -42,10 +52,9 @@ export const ordersService = {
   },
 
   async cancelOrder(orderId: string, notas?: string): Promise<Order> {
-    const response = await api.post<Order>(
-      ENDPOINTS.ORDERS.CANCEL(orderId),
-      { notas }
-    );
+    const response = await api.post<Order>(ENDPOINTS.ORDERS.CANCEL(orderId), {
+      notas,
+    });
     return response.data;
   },
 
@@ -53,6 +62,9 @@ export const ordersService = {
     const response = await api.get<{ results: PaymentMethod[] }>(
       ENDPOINTS.ORDERS.PAYMENT_METHODS
     );
-    return response.data.results || response.data;
+    return (
+      response.data.results ||
+      (Array.isArray(response.data) ? response.data : [])
+    );
   },
 };

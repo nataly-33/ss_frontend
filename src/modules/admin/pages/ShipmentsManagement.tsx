@@ -57,7 +57,7 @@ export const ShipmentsManagement: React.FC = () => {
         search: searchTerm,
         estado: filterEstado,
       });
-      setShipments(response.results || response);
+      setShipments(Array.isArray(response) ? response : response.results || []);
     } catch (error) {
       console.error("Error loading shipments:", error);
     } finally {
