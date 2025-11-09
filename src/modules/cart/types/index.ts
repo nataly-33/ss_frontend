@@ -1,5 +1,3 @@
-import type { Product, Size } from "@modules/products/types";
-
 export interface CartItem {
   id: string;
   prenda: {
@@ -22,6 +20,7 @@ export interface Cart {
   usuario: string;
   items: CartItem[];
   total: number;
+  total_items: number;
   cantidad_items: number;
 }
 
