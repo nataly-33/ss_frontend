@@ -80,11 +80,14 @@ export function OrderFilter({ onFilterChange }: OrderFilterProps) {
                   className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-main/50 focus:border-primary-main"
                 >
                   <option value="">Todos</option>
-                  <option value="pendiente">Pendiente</option>
-                  <option value="procesando">Procesando</option>
+                  <option value="pendiente">Pendiente de pago</option>
+                  <option value="pago_recibido">Pago recibido</option>
+                  <option value="confirmado">Confirmado</option>
+                  <option value="preparando">Preparando</option>
                   <option value="enviado">Enviado</option>
                   <option value="entregado">Entregado</option>
                   <option value="cancelado">Cancelado</option>
+                  <option value="reembolsado">Reembolsado</option>
                 </select>
               </div>
 

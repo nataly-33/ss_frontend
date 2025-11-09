@@ -69,7 +69,10 @@ export default function OrderDetailPage() {
     return null;
   }
 
-  const canCancel = order.estado === "pendiente" || order.estado === "procesando";
+  const canCancel =
+    order.estado === "pendiente" ||
+    order.estado === "pago_recibido" ||
+    order.estado === "confirmado";
 
   return (
     <div className="min-h-screen bg-background-main py-8">
@@ -119,8 +122,8 @@ export default function OrderDetailPage() {
           <div className="lg:col-span-1">
             <OrderTimeline
               estado={order.estado}
-              fechaCreacion={order.fecha_creacion}
-              fechaActualizacion={order.fecha_actualizacion}
+              fechaCreacion={order.created_at}
+              fechaActualizacion={order.updated_at}
             />
           </div>
         </div>

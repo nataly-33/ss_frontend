@@ -56,6 +56,19 @@ export function OrderCard({ order }: OrderCardProps) {
   const navigate = useNavigate();
   const statusColor = getStatusColor(order.estado);
 
+  const detalles = order?.detalles ?? [];
+  const fechaStr = order?.created_at
+    ? new Date(order.created_at).toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      })
+    : "-";
+  const total = Number(order?.total ?? 0);
+
+  // Calcular cantidad total de artículos (suma de cantidades)
+  const cantidadTotal = detalles.reduce((sum, item) => sum + item.cantidad, 0);
+
   const handleViewDetails = () => {
     navigate(PRIVATE_ROUTES.ORDER_DETAIL(order.id));
   };
@@ -70,11 +83,7 @@ export function OrderCard({ order }: OrderCardProps) {
           </h3>
           <p className="text-sm text-text-secondary flex items-center gap-1 mt-1">
             <Calendar className="w-4 h-4" />
-            {new Date(order.fecha_creacion).toLocaleDateString("es-ES", {
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
-            })}
+            {fechaStr}
           </p>
         </div>
 
@@ -94,15 +103,15 @@ export function OrderCard({ order }: OrderCardProps) {
         <div className="flex items-center gap-2 mb-4">
           <Package className="w-5 h-5 text-primary-main" />
           <p className="text-text-secondary">
-            {order.items.length} {order.items.length === 1 ? "artículo" : "artículos"}
+            {cantidadTotal} {cantidadTotal === 1 ? "artículo" : "artículos"}
           </p>
         </div>
 
         {/* Items List */}
         <div className="space-y-2 mb-4">
-          {order.items.slice(0, 2).map((item) => (
+          {detalles.slice(0, 2).map((item) => (
             <div key={item.id} className="flex items-center gap-3">
-              {item.prenda.imagen_principal && (
+              {item.prenda?.imagen_principal && (
                 <img
                   src={item.prenda.imagen_principal}
                   alt={item.prenda.nombre}
@@ -111,17 +120,17 @@ export function OrderCard({ order }: OrderCardProps) {
               )}
               <div className="flex-1">
                 <p className="text-sm font-medium text-text-primary line-clamp-1">
-                  {item.prenda.nombre}
+                  {item.prenda?.nombre}
                 </p>
                 <p className="text-xs text-text-secondary">
-                  Talla: {item.talla.nombre} • Cantidad: {item.cantidad}
+                  Talla: {item.talla?.nombre} • Cantidad: {item.cantidad}
                 </p>
               </div>
             </div>
           ))}
-          {order.items.length > 2 && (
+          {detalles.length > 2 && (
             <p className="text-xs text-text-secondary italic">
-              +{order.items.length - 2} artículos más
+              +{detalles.length - 2} artículos más
             </p>
           )}
         </div>
@@ -133,7 +142,7 @@ export function OrderCard({ order }: OrderCardProps) {
             <span className="font-semibold">Total:</span>
           </div>
           <span className="text-2xl font-display font-bold text-primary-main">
-            ${order.total.toFixed(2)}
+            ${total.toFixed(2)}
           </span>
         </div>
       </div>

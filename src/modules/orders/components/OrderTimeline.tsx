@@ -19,8 +19,10 @@ export function OrderTimeline({
 }: OrderTimelineProps) {
   const getSteps = (): TimelineStep[] => {
     const steps = [
-      { key: "pendiente", label: "Pedido recibido", icon: CheckCircle2 },
-      { key: "procesando", label: "Procesando", icon: Package },
+      { key: "pendiente", label: "Pendiente de pago", icon: CheckCircle2 },
+      { key: "pago_recibido", label: "Pago recibido", icon: CheckCircle2 },
+      { key: "confirmado", label: "Confirmado", icon: CheckCircle2 },
+      { key: "preparando", label: "Preparando", icon: Package },
       { key: "enviado", label: "Enviado", icon: Truck },
       { key: "entregado", label: "Entregado", icon: Home },
     ];
