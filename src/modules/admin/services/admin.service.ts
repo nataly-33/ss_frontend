@@ -211,34 +211,66 @@ export const productsService = {
 
   async create(data: CreateProductData): Promise<Product> {
     try {
-      const formData = new FormData();
-      formData.append("nombre", data.nombre);
-      formData.append("descripcion", data.descripcion);
-      formData.append("precio", String(data.precio));
-      formData.append("marca", data.marca);
-      formData.append("color", data.color);
+      // Si hay imagen, usar FormData; si no, usar JSON
+      if (data.imagen) {
+        const formData = new FormData();
+        formData.append("nombre", data.nombre);
+        formData.append("descripcion", data.descripcion);
+        formData.append("precio", String(data.precio));
+        formData.append("marca", data.marca);
+        formData.append("color", data.color);
 
-      data.categorias.forEach((id: string) =>
-        formData.append("categorias", id)
-      );
-      if (data.tallas_disponibles) {
-        data.tallas_disponibles.forEach((id: string) =>
-          formData.append("tallas_disponibles", id)
+        data.categorias.forEach((id: string) =>
+          formData.append("categorias", id)
         );
-      }
-      if (data.material) formData.append("material", data.material);
-      if (data.activa !== undefined)
-        formData.append("activa", String(data.activa));
-      if (data.destacada !== undefined)
-        formData.append("destacada", String(data.destacada));
-      if (data.es_novedad !== undefined)
-        formData.append("es_novedad", String(data.es_novedad));
-      if (data.imagen) formData.append("imagen", data.imagen);
+        if (data.tallas_disponibles) {
+          data.tallas_disponibles.forEach((id: string) =>
+            formData.append("tallas_disponibles", id)
+          );
+        }
 
-      const response = await api.post(ENDPOINTS.PRODUCTS.BASE, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return response.data;
+        // Agregar stocks si están disponibles
+        if (data.stocks && data.stocks.length > 0) {
+          formData.append("stocks", JSON.stringify(data.stocks));
+        }
+
+        if (data.material) formData.append("material", data.material);
+        if (data.activa !== undefined)
+          formData.append("activa", String(data.activa));
+        if (data.destacada !== undefined)
+          formData.append("destacada", String(data.destacada));
+        if (data.es_novedad !== undefined)
+          formData.append("es_novedad", String(data.es_novedad));
+        formData.append("imagen", data.imagen);
+
+        const response = await api.post(ENDPOINTS.PRODUCTS.BASE, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        return response.data;
+      } else {
+        // Enviar como JSON cuando no hay imagen
+        const jsonData: any = {
+          nombre: data.nombre,
+          descripcion: data.descripcion,
+          precio: data.precio,
+          marca: data.marca,
+          categorias: data.categorias,
+          tallas_disponibles: data.tallas_disponibles || [],
+          color: data.color,
+          material: data.material,
+          activa: data.activa !== undefined ? data.activa : true,
+          destacada: data.destacada || false,
+          es_novedad: data.es_novedad || false,
+        };
+
+        // Agregar stocks si están disponibles
+        if (data.stocks && data.stocks.length > 0) {
+          jsonData.stocks = data.stocks;
+        }
+
+        const response = await api.post(ENDPOINTS.PRODUCTS.BASE, jsonData);
+        return response.data;
+      }
     } catch (error: any) {
       console.error("Error creating product:", error.response?.data);
       throw error;
@@ -247,7 +279,17 @@ export const productsService = {
 
   async update(id: string, data: UpdateProductData): Promise<Product> {
     try {
-      const response = await api.patch(ENDPOINTS.PRODUCTS.BY_ID(id), data);
+      // Preparar datos JSON con stocks
+      const jsonData: any = {
+        ...data,
+      };
+
+      // Si hay stocks, incluirlos
+      if (data.stocks && data.stocks.length > 0) {
+        jsonData.stocks = data.stocks;
+      }
+
+      const response = await api.patch(ENDPOINTS.PRODUCTS.BY_ID(id), jsonData);
       return response.data;
     } catch (error: any) {
       console.error("Error updating product:", error.response?.data);

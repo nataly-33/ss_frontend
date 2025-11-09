@@ -5,8 +5,9 @@ import {
   productsService,
   categoriesService,
   brandsService,
+  sizesService,
 } from "../services/admin.service";
-import type { Product, Category, Brand } from "../types";
+import type { Product, Category, Brand, Size } from "../types";
 import { PageHeader, SearchBar } from "../components";
 
 interface FormData {
@@ -18,6 +19,11 @@ interface FormData {
   color: string;
   material: string;
   tallas: string[];
+  stocks: Array<{
+    talla: string;
+    cantidad: number;
+    stock_minimo: number;
+  }>;
   activa: boolean;
   destacada: boolean;
   es_novedad: boolean;
@@ -29,7 +35,7 @@ export const ProductsManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [tallas, setTallas] = useState<any[]>([]);
+  const [tallas, setTallas] = useState<Size[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState<FormData>({
@@ -41,6 +47,7 @@ export const ProductsManagement: React.FC = () => {
     color: "",
     material: "",
     tallas: [],
+    stocks: [],
     activa: true,
     destacada: false,
     es_novedad: false,
@@ -54,24 +61,12 @@ export const ProductsManagement: React.FC = () => {
 
   const loadTallas = async () => {
     try {
-      // Obtener tallas desde el endpoint del backend
-      const response = await fetch("/api/products/tallas/");
-      if (response.ok) {
-        const data = await response.json();
-        const tallasData = Array.isArray(data) ? data : data.results || data;
-        setTallas(tallasData);
-      }
+      // Usar el servicio configurado con los interceptores de autenticación
+      const tallasData = await sizesService.getAll();
+      setTallas(Array.isArray(tallasData) ? tallasData : []);
     } catch (error) {
       console.error("Error loading tallas:", error);
-      // Si falla, usar datos locales con UUIDs ficticios (el backend asignará los correctos)
-      setTallas([
-        { id: "550e8400-e29b-41d4-a716-446655440001", nombre: "XS" },
-        { id: "550e8400-e29b-41d4-a716-446655440002", nombre: "S" },
-        { id: "550e8400-e29b-41d4-a716-446655440003", nombre: "M" },
-        { id: "550e8400-e29b-41d4-a716-446655440004", nombre: "L" },
-        { id: "550e8400-e29b-41d4-a716-446655440005", nombre: "XL" },
-        { id: "550e8400-e29b-41d4-a716-446655440006", nombre: "XXL" },
-      ]);
+      setTallas([]);
     }
   };
 
@@ -106,22 +101,52 @@ export const ProductsManagement: React.FC = () => {
     }
   };
 
-  const openModal = (product?: Product) => {
+  const openModal = async (product?: Product) => {
     if (product) {
-      setEditingProduct(product);
-      setFormData({
-        nombre: product.nombre,
-        descripcion: product.descripcion || "",
-        precio: product.precio.toString(),
-        marca: product.marca?.id?.toString() || "",
-        categorias: product.categorias?.map((c) => c.id) || [],
-        color: product.color || "",
-        material: product.material || "",
-        tallas: [],
-        activa: product.activa,
-        destacada: product.destacada || false,
-        es_novedad: product.es_novedad || false,
-      });
+      try {
+        // Cargar producto completo para obtener todos los datos incluyendo stocks
+        const fullProduct = await productsService.getById(product.id);
+
+        setEditingProduct(fullProduct);
+
+        // Pre-cargar stocks desde la respuesta detallada
+        const stocks = (fullProduct.stocks || []).map((stock: any) => ({
+          talla: stock.talla,
+          cantidad: stock.cantidad,
+          stock_minimo: stock.stock_minimo || 5,
+        }));
+
+        // Obtener IDs correctamente de las estructuras anidadas
+        const marcaId = typeof fullProduct.marca === 'string'
+          ? fullProduct.marca
+          : fullProduct.marca?.id || "";
+
+        const categoriasIds = (fullProduct.categorias || fullProduct.categorias_detalle || [])
+          .map((c: any) => typeof c === 'string' ? c : c.id);
+
+        const tallasIds = (fullProduct.tallas_disponibles || fullProduct.tallas_disponibles_detalle || [])
+          .map((t: any) => typeof t === 'string' ? t : t.id);
+
+        setFormData({
+          nombre: fullProduct.nombre,
+          descripcion: fullProduct.descripcion || "",
+          precio: typeof fullProduct.precio === 'number'
+            ? fullProduct.precio.toString()
+            : fullProduct.precio.toString(),
+          marca: marcaId,
+          categorias: categoriasIds,
+          color: fullProduct.color || "",
+          material: fullProduct.material || "",
+          tallas: tallasIds,
+          stocks: stocks,
+          activa: fullProduct.activa,
+          destacada: fullProduct.destacada || false,
+          es_novedad: fullProduct.es_novedad || false,
+        });
+      } catch (error) {
+        console.error("Error loading product details:", error);
+        alert("Error al cargar detalles del producto");
+      }
     } else {
       setEditingProduct(null);
       setFormData({
@@ -133,6 +158,7 @@ export const ProductsManagement: React.FC = () => {
         color: "",
         material: "",
         tallas: [],
+        stocks: [],
         activa: true,
         destacada: false,
         es_novedad: false,
@@ -170,11 +196,35 @@ export const ProductsManagement: React.FC = () => {
   };
 
   const handleTallaToggle = (talla: string) => {
+    const isSelected = formData.tallas.includes(talla);
+
+    if (isSelected) {
+      // Remover talla y su stock
+      setFormData({
+        ...formData,
+        tallas: formData.tallas.filter((t) => t !== talla),
+        stocks: formData.stocks.filter((s) => s.talla !== talla),
+      });
+    } else {
+      // Agregar talla con stock default
+      setFormData({
+        ...formData,
+        tallas: [...formData.tallas, talla],
+        stocks: [...formData.stocks, { talla, cantidad: 0, stock_minimo: 5 }],
+      });
+    }
+  };
+
+  const handleStockChange = (
+    tallaId: string,
+    field: "cantidad" | "stock_minimo",
+    value: number
+  ) => {
     setFormData({
       ...formData,
-      tallas: formData.tallas.includes(talla)
-        ? formData.tallas.filter((t) => t !== talla)
-        : [...formData.tallas, talla],
+      stocks: formData.stocks.map((stock) =>
+        stock.talla === tallaId ? { ...stock, [field]: value } : stock
+      ),
     });
   };
 
@@ -190,6 +240,7 @@ export const ProductsManagement: React.FC = () => {
         color: formData.color,
         material: formData.material,
         tallas_disponibles: formData.tallas,
+        stocks: formData.stocks,
         activa: formData.activa,
         destacada: formData.destacada,
         es_novedad: formData.es_novedad,
@@ -552,6 +603,74 @@ export const ProductsManagement: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Stock por Talla */}
+              {formData.tallas.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-3">
+                    📦 Stock por Talla
+                  </label>
+                  <div className="space-y-3 bg-neutral-50 p-4 rounded-lg">
+                    {formData.tallas.map((tallaId) => {
+                      const talla = tallas.find((t: any) => t.id === tallaId);
+                      const stock = formData.stocks.find(
+                        (s) => s.talla === tallaId
+                      );
+
+                      return (
+                        <div
+                          key={tallaId}
+                          className="grid grid-cols-3 gap-3 items-end"
+                        >
+                          <div>
+                            <label className="block text-xs font-medium text-neutral-600 mb-1">
+                              Talla: {talla?.nombre}
+                            </label>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-neutral-600 mb-1">
+                              Cantidad
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={stock?.cantidad || 0}
+                              onChange={(e) =>
+                                handleStockChange(
+                                  tallaId,
+                                  "cantidad",
+                                  parseInt(e.target.value) || 0
+                                )
+                              }
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-neutral-600 mb-1">
+                              Stock Mín.
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={stock?.stock_minimo || 5}
+                              onChange={(e) =>
+                                handleStockChange(
+                                  tallaId,
+                                  "stock_minimo",
+                                  parseInt(e.target.value) || 0
+                                )
+                              }
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                              placeholder="5"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Checkboxes */}
               <div className="space-y-3">

@@ -81,6 +81,10 @@ export interface Product {
     id: string;
     nombre: string;
   }>;
+  categorias_detalle?: Array<{
+    id: string;
+    nombre: string;
+  }>;
   color: string;
   material?: string;
   imagen_principal: string | null;
@@ -90,14 +94,29 @@ export interface Product {
     es_principal: boolean;
   }>;
   stock_total: number;
+  tiene_stock?: boolean;
   activa: boolean;
   destacada: boolean;
   es_novedad: boolean;
-  tallas?: Array<{
+  tallas_disponibles?: Array<{
     id: string;
     nombre: string;
-    stock: number;
   }>;
+  tallas_disponibles_detalle?: Array<{
+    id: string;
+    nombre: string;
+  }>;
+  stocks?: Array<{
+    id: string;
+    talla: string;
+    talla_detalle?: {
+      id: string;
+      nombre: string;
+    };
+    cantidad: number;
+    stock_minimo: number;
+  }>;
+  metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
 }
@@ -115,6 +134,11 @@ export interface CreateProductData {
   destacada?: boolean;
   es_novedad?: boolean;
   imagen?: File;
+  stocks?: Array<{
+    talla: string;
+    cantidad: number;
+    stock_minimo?: number;
+  }>;
 }
 
 export interface UpdateProductData {
@@ -129,6 +153,11 @@ export interface UpdateProductData {
   activa?: boolean;
   destacada?: boolean;
   es_novedad?: boolean;
+  stocks?: Array<{
+    talla: string;
+    cantidad: number;
+    stock_minimo?: number;
+  }>;
 }
 
 export interface Category {
@@ -183,8 +212,6 @@ export interface UpdateBrandData {
 export interface Size {
   id: string;
   nombre: string;
-  codigo: string;
-  activa: boolean;
   orden: number;
 }
 
