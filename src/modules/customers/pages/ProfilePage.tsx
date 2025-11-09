@@ -2,7 +2,12 @@ import type { Address, CustomerProfile } from "../types";
 import { useState, useEffect } from "react";
 import { User, MapPin, Shield, Plus } from "lucide-react";
 import { customersService } from "../services/customers.service";
-import { ProfileForm, AddressList, AddressForm, SecuritySettings } from "../components";
+import {
+  ProfileForm,
+  AddressList,
+  AddressForm,
+  SecuritySettings,
+} from "../components";
 import { Button } from "@shared/components/ui/Button";
 import { LoadingSpinner } from "@shared/components/ui/LoadingSpinner";
 
@@ -70,9 +75,16 @@ export default function NewProfilePage() {
     currentPassword: string;
     newPassword: string;
   }) => {
-    // TODO: Implement change password service
-    console.log("Change password:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      await customersService.changePassword({
+        old_password: data.currentPassword,
+        new_password: data.newPassword,
+        new_password_confirm: data.newPassword,
+      });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      throw error;
+    }
   };
 
   const tabs = [

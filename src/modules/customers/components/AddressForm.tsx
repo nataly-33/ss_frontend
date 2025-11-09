@@ -12,34 +12,39 @@ interface AddressFormProps {
 }
 
 const initialFormData = {
-  calle: "",
-  numero_exterior: "",
-  numero_interior: "",
-  colonia: "",
+  nombre_completo: "",
+  telefono: "",
+  direccion_linea1: "",
+  direccion_linea2: "",
   ciudad: "",
-  estado: "",
+  departamento: "",
   codigo_postal: "",
   pais: "Bolivia",
-  referencias: "",
+  referencia: "",
   es_principal: false,
 };
 
-export function AddressForm({ isOpen, onClose, onSave, address }: AddressFormProps) {
+export function AddressForm({
+  isOpen,
+  onClose,
+  onSave,
+  address,
+}: AddressFormProps) {
   const [formData, setFormData] = useState(initialFormData);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (address) {
       setFormData({
-        calle: address.calle,
-        numero_exterior: address.numero_exterior,
-        numero_interior: address.numero_interior || "",
-        colonia: address.colonia,
+        nombre_completo: address.nombre_completo,
+        telefono: address.telefono,
+        direccion_linea1: address.direccion_linea1,
+        direccion_linea2: address.direccion_linea2 || "",
         ciudad: address.ciudad,
-        estado: address.estado,
+        departamento: address.departamento,
         codigo_postal: address.codigo_postal,
         pais: address.pais,
-        referencias: address.referencias || "",
+        referencia: address.referencia || "",
         es_principal: address.es_principal,
       });
     } else {
@@ -47,11 +52,14 @@ export function AddressForm({ isOpen, onClose, onSave, address }: AddressFormPro
     }
   }, [address, isOpen]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value, type } = e.target;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     });
   };
 
@@ -90,46 +98,59 @@ export function AddressForm({ isOpen, onClose, onSave, address }: AddressFormPro
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
-              <Input
-                label="Calle *"
-                type="text"
-                name="calle"
-                value={formData.calle}
-                onChange={handleChange}
-                placeholder="Av. 16 de Julio"
-                required
-              />
-            </div>
+          {/* Datos Personales */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="N° Exterior *"
+              label="Nombre Completo *"
               type="text"
-              name="numero_exterior"
-              value={formData.numero_exterior}
+              name="nombre_completo"
+              value={formData.nombre_completo}
               onChange={handleChange}
-              placeholder="1234"
+              placeholder="Nombre Apellido"
+              required
+            />
+            <Input
+              label="Teléfono *"
+              type="tel"
+              name="telefono"
+              value={formData.telefono}
+              onChange={handleChange}
+              placeholder="+591 75123456"
               required
             />
           </div>
 
+          {/* Dirección */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <Input
+                label="Calle/Avenida *"
+                type="text"
+                name="direccion_linea1"
+                value={formData.direccion_linea1}
+                onChange={handleChange}
+                placeholder="Av. 16 de Julio #1234"
+                required
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="N° Interior"
+              label="Entre/Referencias adicionales"
               type="text"
-              name="numero_interior"
-              value={formData.numero_interior}
+              name="direccion_linea2"
+              value={formData.direccion_linea2}
               onChange={handleChange}
-              placeholder="Depto 5A (opcional)"
+              placeholder="Entre Av. Oquendo y San Martín (opcional)"
             />
             <Input
-              label="Colonia/Zona *"
+              label="Código Postal"
               type="text"
-              name="colonia"
-              value={formData.colonia}
+              name="codigo_postal"
+              value={formData.codigo_postal}
               onChange={handleChange}
-              placeholder="Sopocachi"
-              required
+              placeholder="00000"
             />
           </div>
 
@@ -144,10 +165,10 @@ export function AddressForm({ isOpen, onClose, onSave, address }: AddressFormPro
               required
             />
             <Input
-              label="Estado/Departamento *"
+              label="Departamento/Estado *"
               type="text"
-              name="estado"
-              value={formData.estado}
+              name="departamento"
+              value={formData.departamento}
               onChange={handleChange}
               placeholder="La Paz"
               required
@@ -155,15 +176,6 @@ export function AddressForm({ isOpen, onClose, onSave, address }: AddressFormPro
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Código Postal *"
-              type="text"
-              name="codigo_postal"
-              value={formData.codigo_postal}
-              onChange={handleChange}
-              placeholder="00000"
-              required
-            />
             <Input
               label="País"
               type="text"
@@ -176,14 +188,14 @@ export function AddressForm({ isOpen, onClose, onSave, address }: AddressFormPro
 
           <div>
             <label className="block text-sm font-semibold text-text-primary mb-2">
-              Referencias
+              Notas y Referencias
             </label>
             <textarea
-              name="referencias"
-              value={formData.referencias}
+              name="referencia"
+              value={formData.referencia}
               onChange={handleChange}
               rows={3}
-              placeholder="Casa esquina, portón azul, entre calle A y B..."
+              placeholder="Cerca del centro comercial, portón azul, tocar timbre..."
               className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-main/50 focus:border-primary-main"
             />
           </div>
@@ -197,7 +209,10 @@ export function AddressForm({ isOpen, onClose, onSave, address }: AddressFormPro
               onChange={handleChange}
               className="w-4 h-4 text-primary-main rounded focus:ring-primary-main"
             />
-            <label htmlFor="es_principal" className="text-sm text-text-secondary">
+            <label
+              htmlFor="es_principal"
+              className="text-sm text-text-secondary"
+            >
               Establecer como dirección principal
             </label>
           </div>
@@ -212,11 +227,7 @@ export function AddressForm({ isOpen, onClose, onSave, address }: AddressFormPro
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              isLoading={isSaving}
-            >
+            <Button type="submit" variant="primary" isLoading={isSaving}>
               {address ? "Guardar cambios" : "Crear dirección"}
             </Button>
           </div>

@@ -10,17 +10,17 @@ interface ProfileFormProps {
 
 export function ProfileForm({ profile, onSave }: ProfileFormProps) {
   const [formData, setFormData] = useState({
-    nombre: profile.usuario.first_name,
-    apellido: profile.usuario.last_name,
+    nombre: profile.nombre,
+    apellido: profile.apellido,
     telefono: profile.telefono || "",
-    fecha_nacimiento: profile.fecha_nacimiento || "",
-    genero: profile.genero || "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -34,8 +34,6 @@ export function ProfileForm({ profile, onSave }: ProfileFormProps) {
     try {
       await onSave({
         telefono: formData.telefono,
-        fecha_nacimiento: formData.fecha_nacimiento || undefined,
-        genero: formData.genero || undefined,
       });
       setIsEditing(false);
     } catch (error) {
@@ -86,7 +84,7 @@ export function ProfileForm({ profile, onSave }: ProfileFormProps) {
           <Input
             label="Correo electrónico"
             type="email"
-            value={profile.usuario.email}
+            value={profile.email}
             disabled
             helperText="Para cambiar tu email, contacta soporte"
           />
@@ -102,55 +100,6 @@ export function ProfileForm({ profile, onSave }: ProfileFormProps) {
           />
         </div>
 
-        {/* Información Adicional */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Fecha de Nacimiento"
-            type="date"
-            name="fecha_nacimiento"
-            value={formData.fecha_nacimiento}
-            onChange={handleChange}
-            disabled={!isEditing}
-          />
-
-          <div>
-            <label className="block text-sm font-semibold text-text-primary mb-2">
-              Género
-            </label>
-            <select
-              name="genero"
-              value={formData.genero}
-              onChange={handleChange}
-              disabled={!isEditing}
-              className={`
-                w-full px-4 py-2 border rounded-lg
-                focus:ring-2 focus:ring-primary-main/50 focus:border-primary-main
-                ${!isEditing ? 'bg-neutral-100 cursor-not-allowed' : 'bg-white'}
-              `}
-            >
-              <option value="">Seleccionar...</option>
-              <option value="M">Masculino</option>
-              <option value="F">Femenino</option>
-              <option value="O">Otro</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Saldo de Billetera (Solo lectura) */}
-        <div className="p-4 bg-primary-light rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-text-secondary">Saldo en Billetera</p>
-              <p className="text-2xl font-display font-bold text-primary-main">
-                ${profile.saldo_billetera.toFixed(2)}
-              </p>
-            </div>
-            <Button variant="outline" size="sm" type="button">
-              Recargar
-            </Button>
-          </div>
-        </div>
-
         {/* Botones de Acción */}
         {isEditing && (
           <div className="flex gap-3 justify-end">
@@ -161,22 +110,16 @@ export function ProfileForm({ profile, onSave }: ProfileFormProps) {
                 setIsEditing(false);
                 // Reset form
                 setFormData({
-                  nombre: profile.usuario.first_name,
-                  apellido: profile.usuario.last_name,
+                  nombre: profile.nombre,
+                  apellido: profile.apellido,
                   telefono: profile.telefono || "",
-                  fecha_nacimiento: profile.fecha_nacimiento || "",
-                  genero: profile.genero || "",
                 });
               }}
               disabled={isSaving}
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              isLoading={isSaving}
-            >
+            <Button type="submit" variant="primary" isLoading={isSaving}>
               Guardar cambios
             </Button>
           </div>

@@ -1,24 +1,26 @@
 import api from "@core/config/api.config";
 import { ENDPOINTS } from "@/core/config/endpoints";
-import type { 
-  Address, 
-  CustomerProfile, 
+import type {
+  Address,
+  CustomerProfile,
   Favorite,
   CreateAddressData,
   UpdateAddressData,
   UpdateProfileData,
-  WalletRechargeData 
+  WalletRechargeData,
 } from "../types";
 
 export const customersService = {
   async getProfile(): Promise<CustomerProfile> {
-    const response = await api.get<CustomerProfile>(ENDPOINTS.CUSTOMERS.PROFILE);
+    const response = await api.get<CustomerProfile>(
+      ENDPOINTS.CUSTOMERS.PROFILE
+    );
     return response.data;
   },
 
   async updateProfile(data: UpdateProfileData): Promise<CustomerProfile> {
     const response = await api.patch<CustomerProfile>(
-      ENDPOINTS.CUSTOMERS.PROFILE, 
+      ENDPOINTS.CUSTOMERS.PROFILE,
       data
     );
     return response.data;
@@ -33,7 +35,7 @@ export const customersService = {
 
   async createAddress(data: CreateAddressData): Promise<Address> {
     const response = await api.post<Address>(
-      ENDPOINTS.CUSTOMERS.ADDRESSES, 
+      ENDPOINTS.CUSTOMERS.ADDRESSES,
       data
     );
     return response.data;
@@ -68,7 +70,9 @@ export const customersService = {
     return response.data.results || response.data;
   },
 
-  async toggleFavorite(prendaId: string): Promise<{ message: string; agregado: boolean }> {
+  async toggleFavorite(
+    prendaId: string
+  ): Promise<{ message: string; agregado: boolean }> {
     const response = await api.post<{ message: string; agregado: boolean }>(
       ENDPOINTS.CUSTOMERS.TOGGLE_FAVORITE,
       { prenda_id: prendaId }
@@ -83,6 +87,18 @@ export const customersService = {
 
   async rechargeWallet(data: WalletRechargeData): Promise<any> {
     const response = await api.post(ENDPOINTS.CUSTOMERS.WALLET_RECHARGE, data);
+    return response.data;
+  },
+
+  async changePassword(data: {
+    old_password: string;
+    new_password: string;
+    new_password_confirm: string;
+  }): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>(
+      ENDPOINTS.AUTH.CHANGE_PASSWORD(),
+      data
+    );
     return response.data;
   },
 };

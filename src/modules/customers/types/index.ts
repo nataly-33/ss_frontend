@@ -24,7 +24,6 @@ export interface CustomerProfile {
   nombre_completo?: string;
   telefono?: string;
   foto_perfil?: string;
-  saldo_billetera: number;
   email_verificado: boolean;
   direccion_principal?: Address;
   total_compras: number;
@@ -56,5 +55,5 @@ export interface AddFavoriteData {
 
 export interface WalletRechargeData {
   monto: number;
-  metodo_pago: 'tarjeta' | 'transferencia';
+  metodo_pago: "tarjeta" | "transferencia";
 }

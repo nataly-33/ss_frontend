@@ -46,9 +46,10 @@ export function AddressList({
           key={address.id}
           className={`
             relative bg-white rounded-xl shadow-md p-6 border-2 transition-all
-            ${address.es_principal 
-              ? 'border-primary-main bg-primary-light/30' 
-              : 'border-transparent hover:border-neutral-200'
+            ${
+              address.es_principal
+                ? "border-primary-main bg-primary-light/30"
+                : "border-transparent hover:border-neutral-200"
             }
           `}
         >
@@ -72,20 +73,18 @@ export function AddressList({
 
           {/* Dirección */}
           <div className="space-y-1 mb-4 text-text-secondary">
-            <p className="font-medium">
-              {address.calle} #{address.numero_exterior}
-              {address.numero_interior && ` Int. ${address.numero_interior}`}
+            <p className="font-medium">{address.nombre_completo}</p>
+            <p className="text-sm text-text-secondary">{address.telefono}</p>
+            <p>
+              {address.direccion_linea1}
+              {address.direccion_linea2 && `, ${address.direccion_linea2}`}
             </p>
             <p>
-              {address.colonia}, {address.ciudad}
+              {address.ciudad}, {address.departamento}
+              {address.codigo_postal && ` - CP ${address.codigo_postal}`}
             </p>
-            <p>
-              {address.estado} - CP {address.codigo_postal}
-            </p>
-            {address.referencias && (
-              <p className="text-sm italic mt-2">
-                Ref: {address.referencias}
-              </p>
+            {address.referencia && (
+              <p className="text-sm italic mt-2">Ref: {address.referencia}</p>
             )}
           </div>
 
@@ -102,12 +101,8 @@ export function AddressList({
                 Hacer principal
               </Button>
             )}
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEdit(address)}
-            >
+
+            <Button variant="outline" size="sm" onClick={() => onEdit(address)}>
               <Edit2 className="w-4 h-4" />
             </Button>
 
