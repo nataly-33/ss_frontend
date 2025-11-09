@@ -11,7 +11,6 @@ export interface User {
     nombre: string;
   };
   codigo_empleado?: string;
-  saldo_billetera?: number;
   activo: boolean;
   email_verificado: boolean;
   created_at: string;
@@ -77,7 +76,7 @@ export interface Product {
     id: string;
     nombre: string;
   };
-  marca_nombre?: string; 
+  marca_nombre?: string;
   categorias: Array<{
     id: string;
     nombre: string;
@@ -107,9 +106,9 @@ export interface CreateProductData {
   nombre: string;
   descripcion: string;
   precio: number;
-  marca_id: string;
-  categoria_ids: string[];
-  talla_ids?: string[];
+  marca: string;
+  categorias: string[];
+  tallas_disponibles?: string[];
   color: string;
   material?: string;
   activa?: boolean;
@@ -122,8 +121,9 @@ export interface UpdateProductData {
   nombre?: string;
   descripcion?: string;
   precio?: number;
-  marca_id?: string;
-  categoria_ids?: string[];
+  marca?: string;
+  categorias?: string[];
+  tallas_disponibles?: string[];
   color?: string;
   material?: string;
   activa?: boolean;
@@ -186,6 +186,65 @@ export interface Size {
   codigo: string;
   activa: boolean;
   orden: number;
+}
+
+export interface OrderDetail {
+  id: string;
+  prenda: string;
+  prenda_detalle: Product;
+  talla: string;
+  talla_detalle: Size;
+  cantidad: number;
+  precio_unitario: number;
+  subtotal: number;
+}
+
+export interface Order {
+  id: string;
+  numero_pedido: string;
+  usuario_detalle?: User;
+  estado:
+    | "pendiente"
+    | "pago_recibido"
+    | "confirmado"
+    | "preparando"
+    | "enviado"
+    | "entregado"
+    | "cancelado"
+    | "reembolsado";
+  subtotal: number;
+  descuento: number;
+  costo_envio: number;
+  total: number;
+  total_items: number;
+  notas_cliente?: string;
+  notas_internas?: string;
+  detalles?: OrderDetail[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Shipment {
+  id: string;
+  numero_seguimiento: string;
+  pedido_numero: string;
+  estado:
+    | "pendiente"
+    | "preparando"
+    | "recogido"
+    | "en_transito"
+    | "entregado"
+    | "devuelto"
+    | "cancelado";
+  asignado_a?: User;
+  fecha_envio?: string;
+  fecha_entrega_estimada?: string;
+  fecha_entrega_real?: string;
+  empresa_transportista?: string;
+  costo_envio: number;
+  notas?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PaginatedResponse<T> {

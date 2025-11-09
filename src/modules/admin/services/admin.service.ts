@@ -21,6 +21,8 @@ import type {
   CreateBrandData,
   UpdateBrandData,
   Size,
+  Order,
+  Shipment,
   PaginatedResponse,
 } from "../types";
 
@@ -82,12 +84,14 @@ export const usersService = {
     }
   },
 
-  async changePassword(
-    id: string,
-    data: { old_password: string; new_password: string; new_password_confirm: string }
-  ): Promise<void> {
+  async changePassword(data: {
+    old_password: string;
+    new_password: string;
+    new_password_confirm: string;
+  }): Promise<void> {
     try {
-      await api.post(ENDPOINTS.AUTH.CHANGE_PASSWORD(id), data);
+      // Endpoint genérico para cambiar la contraseña del usuario actual
+      await api.post(`${ENDPOINTS.USERS.BASE}change_password/`, data);
     } catch (error: any) {
       console.error("Error changing password:", error.response?.data);
       throw error;
@@ -148,7 +152,7 @@ export const rolesService = {
 
   async getPermissions(): Promise<Permission[]> {
     try {
-      const response = await api.get("/api/auth/permissions/");
+      const response = await api.get("auth/permissions/");
       return response.data.results || response.data;
     } catch (error: any) {
       console.error("Error fetching permissions:", error.response?.data);
@@ -259,7 +263,9 @@ export const productsService = {
 
 // CATEGORIES
 export const categoriesService = {
-  async getAll(filters?: CategoryFilters): Promise<PaginatedResponse<Category>> {
+  async getAll(
+    filters?: CategoryFilters
+  ): Promise<PaginatedResponse<Category>> {
     try {
       const params = new URLSearchParams();
       if (filters?.search) params.append("search", filters.search);
@@ -267,7 +273,9 @@ export const categoriesService = {
         params.append("activa", String(filters.activa));
       if (filters?.page) params.append("page", String(filters.page));
 
-      const response = await api.get(`${ENDPOINTS.PRODUCTS.CATEGORIES}?${params}`);
+      const response = await api.get(
+        `${ENDPOINTS.PRODUCTS.CATEGORIES}?${params}`
+      );
       return response.data;
     } catch (error: any) {
       console.error("Error fetching categories:", error.response?.data);
@@ -434,6 +442,144 @@ export const sizesService = {
   },
 };
 
+// ORDERS
+export const ordersService = {
+  async getAll(filters?: any): Promise<PaginatedResponse<Order>> {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.search) params.append("search", filters.search);
+      if (filters?.estado) params.append("estado", filters.estado);
+      if (filters?.page) params.append("page", String(filters.page));
+
+      const response = await api.get(`${ENDPOINTS.ORDERS.BASE}?${params}`);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching orders:", error.response?.data);
+      throw error;
+    }
+  },
+
+  async getById(id: string): Promise<Order> {
+    try {
+      const response = await api.get(ENDPOINTS.ORDERS.BY_ID(id));
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching order:", error.response?.data);
+      throw error;
+    }
+  },
+
+  async updateStatus(
+    id: string,
+    estado: string,
+    notas?: string
+  ): Promise<Order> {
+    try {
+      const response = await api.post(ENDPOINTS.ORDERS.UPDATE_STATUS(id), {
+        nuevo_estado: estado,
+        notas: notas || "",
+      });
+      return response.data.pedido || response.data;
+    } catch (error: any) {
+      console.error("Error updating order status:", error.response?.data);
+      throw error;
+    }
+  },
+
+  async cancel(id: string): Promise<Order> {
+    try {
+      const response = await api.post(ENDPOINTS.ORDERS.CANCEL(id), {});
+      return response.data.pedido || response.data;
+    } catch (error: any) {
+      console.error("Error canceling order:", error.response?.data);
+      throw error;
+    }
+  },
+};
+
+// SHIPMENTS
+export const shipmentsService = {
+  async getAll(filters?: any): Promise<PaginatedResponse<Shipment>> {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.search) params.append("search", filters.search);
+      if (filters?.estado) params.append("estado", filters.estado);
+      if (filters?.page) params.append("page", String(filters.page));
+
+      const response = await api.get(
+        `${ENDPOINTS.ORDERS.BASE}envios/?${params}`
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching shipments:", error.response?.data);
+      throw error;
+    }
+  },
+
+  async getById(id: string): Promise<Shipment> {
+    try {
+      const response = await api.get(`${ENDPOINTS.ORDERS.BASE}envios/${id}/`);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching shipment:", error.response?.data);
+      throw error;
+    }
+  },
+
+  async create(data: {
+    pedido_id: string;
+    empresa_transportista?: string;
+    costo_envio?: number;
+  }): Promise<Shipment> {
+    try {
+      const response = await api.post(`${ENDPOINTS.ORDERS.BASE}envios/`, data);
+      return response.data;
+    } catch (error: any) {
+      console.error("Error creating shipment:", error.response?.data);
+      throw error;
+    }
+  },
+
+  async updateStatus(id: string, estado: string): Promise<Shipment> {
+    try {
+      const response = await api.post(
+        `${ENDPOINTS.ORDERS.BASE}envios/${id}/cambiar_estado/`,
+        {
+          nuevo_estado: estado,
+        }
+      );
+      return response.data.envio || response.data;
+    } catch (error: any) {
+      console.error("Error updating shipment status:", error.response?.data);
+      throw error;
+    }
+  },
+
+  async assignDelivery(id: string, delivery_id: string): Promise<Shipment> {
+    try {
+      const response = await api.post(
+        `${ENDPOINTS.ORDERS.BASE}envios/${id}/asignar_delivery/`,
+        {
+          delivery_id,
+        }
+      );
+      return response.data.envio || response.data;
+    } catch (error: any) {
+      console.error("Error assigning delivery:", error.response?.data);
+      throw error;
+    }
+  },
+
+  async delete(id: string): Promise<void> {
+    try {
+      await api.delete(`${ENDPOINTS.ORDERS.BASE}envios/${id}/`);
+    } catch (error: any) {
+      console.error("Error deleting shipment:", error.response?.data);
+      throw error;
+    }
+  },
+};
+
 export const adminService = {
   users: usersService,
   roles: rolesService,
@@ -441,6 +587,8 @@ export const adminService = {
   categories: categoriesService,
   brands: brandsService,
   sizes: sizesService,
+  orders: ordersService,
+  shipments: shipmentsService,
 };
 
 export default adminService;
