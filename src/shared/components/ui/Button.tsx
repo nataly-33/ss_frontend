@@ -23,13 +23,12 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variants = {
     primary:
-      "bg-accent-chocolate text-white hover:bg-accent-chocolateHover hover:shadow-lg hover:scale-105 active:scale-100",
-    secondary: 
+      "bg-accent-cream text-gray-900 hover:bg-accent-mauve hover:text-gray-900 hover:shadow-lg hover:scale-105 active:scale-100",
+    secondary:
       "bg-accent-mauve text-white hover:bg-accent-chocolate hover:shadow-lg hover:scale-105 active:scale-100",
-    outline: 
-      "border-2 border-accent-chocolate text-accent-chocolate hover:bg-accent-chocolate hover:text-white hover:shadow-lg",
-    ghost: 
-      "text-text-secondary hover:bg-primary-light hover:text-accent-chocolate",
+    outline:
+      "border-2 border-accent-cream text-accent-cream hover:bg-accent-cream hover:text-gray-900 hover:shadow-lg",
+    ghost: "text-text-secondary hover:bg-primary-light hover:text-accent-cream",
     danger:
       "bg-error text-white hover:bg-error/90 hover:shadow-lg hover:scale-105 active:scale-100",
   };
@@ -46,9 +45,7 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled || isLoading}
       {...props}
     >
-      {isLoading && (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      )}
+      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       {children}
     </button>
   );
