@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Inter:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -8,37 +8,40 @@
   /* Variables CSS para colores */
   :root {
     /* Colores principales */
-    --color-primary-light: #E2B8AD;
-    --color-primary-main: #CFA195;
-    --color-primary-dark: #87564B;
-    --color-primary-darker: #6D322A;
-    
+    --color-primary-light: #f5ebe8;
+    --color-primary-main: #cfa195;
+    --color-primary-dark: #87564b;
+    --color-primary-darker: #6d322a;
+
     /* Colores neutros */
-    --color-neutral-lightest: #FAF9F8;
-    --color-neutral-light: #F5F3F1;
-    --color-neutral-medium: #D2BDAB;
-    --color-neutral-dark: #A59383;
-    --color-neutral-darker: #6D3222;
+    --color-neutral-lightest: #faf9f8;
+    --color-neutral-light: #f5f3f1;
+    --color-neutral-medium: #d2bdab;
+    --color-neutral-dark: #a59383;
+    --color-neutral-darker: #6d3222;
     --color-neutral-text: #333333;
-    
+
     /* Colores de acento */
-    --color-accent-chocolate: #6D3222;
-    --color-accent-chocolate-hover: #6D322A;
-    --color-accent-mauve: #87564B;
-    --color-accent-rose: #CFA195;
-    --color-accent-cream: #E2B8AD;
-    
+    --color-accent-chocolate: #6d3222;
+    --color-accent-chocolate-hover: #6d322a;
+    --color-accent-mauve: #87564b;
+    --color-accent-rose: #87564b;
+    --color-accent-cream: #e2b8ad;
+
+    /* Acento seleccionable (default: mauve) */
+    --color-accent-selected: #87564b;
+
     /* Texto */
     --color-text-primary: #333333;
-    --color-text-important: #6D322A;
-    --color-text-secondary: #6D3222;
-    --color-text-muted: #A59383;
-    
+    --color-text-important: #6d322a;
+    --color-text-secondary: #6d3222;
+    --color-text-muted: #a59383;
+
     /* Fondos */
-    --color-bg-main: #D2BDAB;
-    --color-bg-card: #A59383;
-    --color-bg-header: #E2B8AD;
-    
+    --color-bg-main: #d2bdab;
+    --color-bg-card: #a59383;
+    --color-bg-header: #e2b8ad;
+
     /* Estados */
     --color-success: #60a67a;
     --color-warning: #d3b34a;
@@ -51,7 +54,9 @@
   }
 
   body {
-    @apply bg-background text-neutral-text font-serif antialiased;
+    @apply bg-background text-neutral-text font-sans antialiased;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
   }
 
   h1,
@@ -61,16 +66,17 @@
   h5,
   h6 {
     @apply text-text-important font-display font-bold;
+    font-family: "Playfair Display", serif;
   }
-  
+
   h1 {
     @apply text-4xl md:text-5xl;
   }
-  
+
   h2 {
     @apply text-3xl md:text-4xl;
   }
-  
+
   h3 {
     @apply text-2xl md:text-3xl;
   }

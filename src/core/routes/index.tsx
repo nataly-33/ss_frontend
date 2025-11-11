@@ -33,6 +33,10 @@ import { OrdersManagement } from "@/modules/admin/pages/OrdersManagement";
 import { ShipmentsManagement } from "@/modules/admin/pages/ShipmentsManagement";
 import { SettingsManagement } from "@/modules/admin/pages/SettingsManagement";
 
+//Reports and Analytics
+import { ReportsPage } from "@/modules/reports/pages/ReportsPage";
+import { AnalyticsPage } from "@/modules/reports/pages/AnalyticsPage";
+
 export const AppRoutes: React.FC = () => {
   return (
     <BrowserRouter>
@@ -44,7 +48,10 @@ export const AppRoutes: React.FC = () => {
         {/* Admin Routes */}
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminDashboard />}>
-            <Route index element={<AdminDashboardOverview />} />
+            {/* Analytics como página por defecto */}
+            <Route index element={<Navigate to="/admin/analytics" replace />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="reports" element={<ReportsPage />} />
             <Route path="users" element={<UsersManagement />} />
             <Route path="roles" element={<RolesManagement />} />
             <Route path="products" element={<ProductsManagement />} />
