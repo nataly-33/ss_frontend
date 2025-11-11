@@ -7,7 +7,6 @@ import {
   TrendingUp,
   DollarSign,
 } from "lucide-react";
-import { PageHeader } from "../components";
 
 interface DashboardStats {
   totalUsers: number;
@@ -75,9 +74,7 @@ export const AdminDashboardOverview: React.FC = () => {
   );
 
   return (
-    <div className="p-8">
-      <PageHeader title="Dashboard" description="Resumen general del sistema" />
-
+    <div className="space-y-8">
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <StatCard

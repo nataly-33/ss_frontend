@@ -3,7 +3,7 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { Button } from "@shared/components/ui/Button";
 import { categoriesService } from "../services/admin.service";
 import type { Category } from "../types";
-import { PageHeader, StatusBadge } from "../components";
+import { StatusBadge } from "../components";
 
 export const CategoriesManagement: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -99,58 +99,62 @@ export const CategoriesManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-8">
-      <PageHeader
-        title="Gestión de Categorías"
-        description="Organiza tus productos por categorías"
-        action={
-          <Button variant="primary" size="lg" onClick={handleCreate}>
-            <Plus size={20} className="mr-2" />
-            Nueva Categoría
-          </Button>
-        }
-      />
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex justify-end">
+        <Button variant="primary" size="md" onClick={handleCreate}>
+          <Plus size={18} className="mr-2" />
+          Nueva Categoría
+        </Button>
+      </div>
 
       {/* Categories Grid */}
       {loading ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+        <div className="bg-white rounded-lg shadow-sm p-12 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
         </div>
+      ) : categories.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+          <p className="text-neutral-600 mb-4">No hay categorías creadas</p>
+          <Button variant="primary" onClick={handleCreate}>
+            Crear Primera Categoría
+          </Button>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map((category) => (
             <div
               key={category.id}
-              className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+              className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+                  <h3 className="text-base font-semibold text-neutral-900 mb-1">
                     {category.nombre}
                   </h3>
-                  <p className="text-sm text-neutral-600 line-clamp-2">
+                  <p className="text-xs text-neutral-600 line-clamp-2">
                     {category.descripcion || "Sin descripción"}
                   </p>
                 </div>
                 <StatusBadge status={category.activa} />
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-neutral-200">
-                <span className="text-sm text-neutral-600">
+              <div className="flex items-center justify-between pt-3 border-t border-neutral-200">
+                <span className="text-xs text-neutral-600">
                   {category.total_prendas} productos
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleEdit(category)}
-                    className="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                    className="p-1.5 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                   >
-                    <Edit size={18} />
+                    <Edit size={16} />
                   </button>
                   <button
                     onClick={() => handleDelete(category)}
-                    className="p-2 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-1.5 text-neutral-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>
@@ -159,26 +163,17 @@ export const CategoriesManagement: React.FC = () => {
         </div>
       )}
 
-      {categories.length === 0 && !loading && (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-          <p className="text-neutral-600 mb-4">No hay categorías creadas</p>
-          <Button variant="primary" onClick={handleCreate}>
-            Crear Primera Categoría
-          </Button>
-        </div>
-      )}
-
       {/* Form Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-bold mb-4">
+          <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-md">
+            <h2 className="text-base font-bold mb-3">
               {editingCategory ? "Editar Categoría" : "Nueva Categoría"}
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                <label className="block text-xs font-medium text-neutral-700 mb-1">
                   Nombre
                 </label>
                 <input
@@ -188,12 +183,12 @@ export const CategoriesManagement: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, nombre: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-primary-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                <label className="block text-xs font-medium text-neutral-700 mb-1">
                   Descripción
                 </label>
                 <textarea
@@ -202,12 +197,12 @@ export const CategoriesManagement: React.FC = () => {
                     setFormData({ ...formData, descripcion: e.target.value })
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-primary-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                <label className="block text-xs font-medium text-neutral-700 mb-1">
                   Imagen
                 </label>
                 <input
@@ -219,7 +214,7 @@ export const CategoriesManagement: React.FC = () => {
                       imagen: e.target.files?.[0] || null,
                     })
                   }
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-primary-500"
                 />
               </div>
 
@@ -235,13 +230,13 @@ export const CategoriesManagement: React.FC = () => {
                 />
                 <label
                   htmlFor="activa"
-                  className="ml-2 text-sm text-neutral-700"
+                  className="ml-2 text-xs text-neutral-700"
                 >
                   Categoría activa
                 </label>
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2 pt-3">
                 <Button
                   type="button"
                   variant="secondary"

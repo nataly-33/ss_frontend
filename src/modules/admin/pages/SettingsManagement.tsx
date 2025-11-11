@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Save, AlertCircle } from "lucide-react";
-import { PageHeader } from "../components";
+import { Save } from "lucide-react";
+import { Button } from "@shared/components/ui/Button";
 
 interface Settings {
   store_name: string;
@@ -78,17 +78,11 @@ export const SettingsManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-8">
-      <PageHeader
-        title="Configuración"
-        description="Administra la configuración de la tienda"
-      />
-
+    <div className="space-y-6">
       {/* Success Message */}
       {saved && (
-        <div className="mb-6 p-4 bg-green-100 border border-green-300 text-green-700 rounded-lg flex items-center gap-2">
-          <AlertCircle size={20} />
-          Configuración guardada correctamente
+        <div className="p-4 bg-green-100 border border-green-300 text-green-700 rounded-lg flex items-center gap-2">
+          ✓ Configuración guardada correctamente
         </div>
       )}
 
@@ -304,42 +298,18 @@ export const SettingsManagement: React.FC = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div>
           {/* Save Button */}
-          <div className="bg-white rounded-xl shadow-sm p-6 sticky top-8">
-            <button
+          <div className="bg-accent-cream rounded-xl shadow-sm p-6 sticky top-8">
+            <Button
               onClick={handleSave}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              variant="primary"
+              className="w-full flex items-center justify-center gap-2"
             >
               <Save size={20} />
               {loading ? "Guardando..." : "Guardar Cambios"}
-            </button>
-          </div>
-
-          {/* Information Box */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <h4 className="font-semibold text-blue-900 mb-2">💡 Información</h4>
-            <p className="text-sm text-blue-700">
-              Estos ajustes afectan el funcionamiento general de la tienda.
-              Guarda los cambios después de modificar cualquier valor.
-            </p>
-          </div>
-
-          {/* Help Section */}
-          <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
-            <h4 className="font-semibold text-neutral-900 mb-2">
-              ❓ ¿Necesitas ayuda?
-            </h4>
-            <p className="text-sm text-neutral-600 mb-3">
-              Consulta la documentación o contacta con soporte.
-            </p>
-            <a
-              href="#"
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-            >
-              Ver Documentación →
-            </a>
+            </Button>
           </div>
         </div>
       </div>

@@ -6,7 +6,6 @@ import type { User, Role } from "../types";
 import {
   DataTable,
   SearchBar,
-  PageHeader,
   StatusBadge,
   RoleBadge,
   commonActions,
@@ -21,6 +20,9 @@ export const UsersManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 10;
   const [formData, setFormData] = useState({
     email: "",
     nombre: "",
@@ -37,14 +39,25 @@ export const UsersManagement: React.FC = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  const loadData = async (pageNum = 1) => {
     try {
       setLoading(true);
       const [usersData, rolesData] = await Promise.all([
-        usersService.getAll({ search: searchTerm }),
+        usersService.getAll({
+          search: searchTerm,
+          page: pageNum,
+        }),
         rolesService.getAll(),
       ]);
-      setUsers(Array.isArray(usersData) ? usersData : usersData.results || []);
+      const userData = Array.isArray(usersData)
+        ? usersData
+        : usersData.results || [];
+      const count =
+        usersData.count ?? (Array.isArray(usersData) ? usersData.length : 0);
+
+      setUsers(userData);
+      setTotalCount(count);
+      setPage(pageNum);
       setRoles(rolesData);
     } catch (error) {
       console.error("Error loading data:", error);
@@ -136,7 +149,7 @@ export const UsersManagement: React.FC = () => {
   // Refetch on search
   useEffect(() => {
     const timer = setTimeout(() => {
-      loadData();
+      loadData(1); // Reset to page 1 on search
     }, 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
@@ -191,35 +204,36 @@ export const UsersManagement: React.FC = () => {
   ];
 
   return (
-    <div className="p-8">
-      <PageHeader
-        title="Gestión de Usuarios"
-        description="Administra los usuarios del sistema"
-        action={
-          <Button variant="primary" size="lg" onClick={handleCreate}>
-            <Plus size={20} className="mr-2" />
-            Nuevo Usuario
-          </Button>
-        }
-      />
-
-      {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-        <SearchBar
-          value={searchTerm}
-          onChange={setSearchTerm}
-          placeholder="Buscar usuarios..."
-        />
+    <div className="space-y-6">
+      {/* SearchBar + Nuevo Usuario en misma fila */}
+      <div className="flex gap-4 items-center">
+        <div className="flex-1 bg-white rounded-xl shadow-sm p-4">
+          <SearchBar
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Buscar usuarios..."
+          />
+        </div>
+        <Button variant="primary" size="lg" onClick={handleCreate}>
+          <Plus size={20} className="mr-2" />
+          Nuevo Usuario
+        </Button>
       </div>
 
-      {/* Table */}
-      <DataTable
-        data={users}
-        columns={columns}
-        actions={actions}
-        loading={loading}
-        emptyMessage="No se encontraron usuarios"
-      />
+      {/* Table with Scroll Limit */}
+      <div className="max-h-[60vh] overflow-y-auto">
+        <DataTable
+          data={users}
+          columns={columns}
+          actions={actions}
+          loading={loading}
+          emptyMessage="No se encontraron usuarios"
+          totalCount={totalCount}
+          pageSize={pageSize}
+          currentPage={page}
+          onPageChange={(p) => loadData(p)}
+        />
+      </div>
 
       {/* Form Modal */}
       {showForm && (

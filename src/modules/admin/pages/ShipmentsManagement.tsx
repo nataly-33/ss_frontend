@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Trash2, Truck, Plus } from "lucide-react";
 import { Button } from "@shared/components/ui/Button";
 import { shipmentsService, usersService } from "../services/admin.service";
-import type { Shipment, User } from "../types";
-import { PageHeader, SearchBar } from "../components";
+import type { Shipment, Order, User } from "../types";
+import { SearchBar } from "../components";
 
 const ESTADOS_ENVIO = [
   {
@@ -138,44 +138,41 @@ export const ShipmentsManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-8">
-      <PageHeader
-        title="Gestión de Envíos"
-        description="Administra todos los envíos de pedidos"
-      />
-
+    <div className="space-y-6">
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <SearchBar
-              value={searchTerm}
-              onChange={setSearchTerm}
-              placeholder="Buscar por número de seguimiento..."
-            />
+      <div className="flex gap-4 items-center">
+        <div className="flex-1 bg-white rounded-xl shadow-sm p-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <SearchBar
+                value={searchTerm}
+                onChange={setSearchTerm}
+                placeholder="Buscar por número de seguimiento..."
+              />
+            </div>
+            <select
+              value={filterEstado}
+              onChange={(e) => setFilterEstado(e.target.value)}
+              className="px-4 py-2 border border-neutral-300 rounded-lg focus:border-primary-500"
+            >
+              <option value="">Todos los estados</option>
+              {ESTADOS_ENVIO.map((estado) => (
+                <option key={estado.value} value={estado.value}>
+                  {estado.label}
+                </option>
+              ))}
+            </select>
           </div>
-          <select
-            value={filterEstado}
-            onChange={(e) => setFilterEstado(e.target.value)}
-            className="px-4 py-2 border border-neutral-300 rounded-lg focus:border-primary-500"
-          >
-            <option value="">Todos los estados</option>
-            {ESTADOS_ENVIO.map((estado) => (
-              <option key={estado.value} value={estado.value}>
-                {estado.label}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
 
-      {/* Shipments Table */}
+      {/* Shipments Table with Scroll Limit */}
       {loading ? (
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden max-h-[60vh] overflow-y-auto">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-neutral-50 border-b border-neutral-200">

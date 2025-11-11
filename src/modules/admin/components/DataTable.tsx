@@ -1,5 +1,6 @@
 import React from "react";
 import { Edit, Trash2, Eye, MoreVertical } from "lucide-react";
+import { Pagination } from "@shared/components/ui/Pagination";
 
 export interface Column<T> {
   key: string;
@@ -25,6 +26,11 @@ interface DataTableProps<T> {
   onSort?: (key: string) => void;
   sortKey?: string;
   sortDirection?: "asc" | "desc";
+  // Pagination props
+  totalCount?: number;
+  pageSize?: number;
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export function DataTable<T extends { id: string }>({
@@ -36,6 +42,10 @@ export function DataTable<T extends { id: string }>({
   onSort,
   sortKey,
   sortDirection,
+  totalCount,
+  pageSize,
+  currentPage,
+  onPageChange,
 }: DataTableProps<T>) {
   if (loading) {
     return (
@@ -54,87 +64,105 @@ export function DataTable<T extends { id: string }>({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-neutral-50 border-b border-neutral-200">
-            <tr>
-              {columns.map((column) => (
-                <th
-                  key={column.key}
-                  className={`px-6 py-4 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider ${
-                    column.sortable ? "cursor-pointer hover:bg-neutral-100" : ""
-                  }`}
-                  onClick={() =>
-                    column.sortable && onSort && onSort(column.key)
-                  }
-                >
-                  <div className="flex items-center gap-2">
-                    {column.label}
-                    {column.sortable && sortKey === column.key && (
-                      <span className="text-primary-600">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-              ))}
-              {actions && actions.length > 0 && (
-                <th className="px-6 py-4 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-200">
-            {data.map((item) => (
-              <tr
-                key={item.id}
-                className="hover:bg-neutral-50 transition-colors"
-              >
+    <div>
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead
+              style={{ backgroundColor: "#87564b" }}
+              className="border-b border-neutral-200"
+            >
+              <tr>
                 {columns.map((column) => (
-                  <td key={column.key} className="px-6 py-4">
-                    {column.render
-                      ? column.render(item)
-                      : String((item as any)[column.key] ?? "-")}
-                  </td>
+                  <th
+                    key={column.key}
+                    className={`px-6 py-4 text-left text-xs font-medium text-black uppercase tracking-wider ${
+                      column.sortable ? "cursor-pointer hover:opacity-90" : ""
+                    }`}
+                    onClick={() =>
+                      column.sortable && onSort && onSort(column.key)
+                    }
+                  >
+                    <div className="flex items-center gap-2">
+                      {column.label}
+                      {column.sortable && sortKey === column.key && (
+                        <span className="text-white">
+                          {sortDirection === "asc" ? "↑" : "↓"}
+                        </span>
+                      )}
+                    </div>
+                  </th>
                 ))}
                 {actions && actions.length > 0 && (
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {actions.map((action, index) => {
-                        if (action.show && !action.show(item)) return null;
-
-                        const variantClasses = {
-                          default:
-                            "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100",
-                          danger:
-                            "text-neutral-600 hover:text-red-600 hover:bg-red-50",
-                          primary:
-                            "text-neutral-600 hover:text-primary-600 hover:bg-primary-50",
-                        };
-
-                        return (
-                          <button
-                            key={index}
-                            onClick={() => action.onClick(item)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              variantClasses[action.variant || "default"]
-                            }`}
-                            title={action.label}
-                          >
-                            {action.icon || <MoreVertical size={18} />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </td>
+                  <th className="px-6 py-4 text-right text-xs font-medium text-black uppercase tracking-wider">
+                    Acciones
+                  </th>
                 )}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-neutral-200">
+              {data.map((item, index) => (
+                <tr
+                  key={item.id}
+                  style={{
+                    backgroundColor: index % 2 === 0 ? "#ffffff" : "#f5ebe8",
+                  }}
+                  className="hover:opacity-90 transition-opacity"
+                >
+                  {columns.map((column) => (
+                    <td key={column.key} className="px-6 py-4">
+                      {column.render
+                        ? column.render(item)
+                        : String((item as any)[column.key] ?? "-")}
+                    </td>
+                  ))}
+                  {actions && actions.length > 0 && (
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {actions.map((action, index) => {
+                          if (action.show && !action.show(item)) return null;
+
+                          const variantClasses = {
+                            default:
+                              "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100",
+                            danger:
+                              "text-neutral-600 hover:text-red-600 hover:bg-red-50",
+                            primary:
+                              "text-neutral-600 hover:text-primary-600 hover:bg-primary-50",
+                          };
+
+                          return (
+                            <button
+                              key={index}
+                              onClick={() => action.onClick(item)}
+                              className={`p-2 rounded-lg transition-colors ${
+                                variantClasses[action.variant || "default"]
+                              }`}
+                              title={action.label}
+                            >
+                              {action.icon || <MoreVertical size={18} />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      {/* Pagination */}
+      {totalCount !== undefined && pageSize && currentPage && onPageChange && (
+        <Pagination
+          total={totalCount}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 }
