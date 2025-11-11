@@ -32,6 +32,7 @@ import { BrandsManagement } from "@/modules/admin/pages/BrandsManagement";
 import { OrdersManagement } from "@/modules/admin/pages/OrdersManagement";
 import { ShipmentsManagement } from "@/modules/admin/pages/ShipmentsManagement";
 import { SettingsManagement } from "@/modules/admin/pages/SettingsManagement";
+import AdminPredictions from "@/modules/admin/pages/AdminPredictions";
 
 //Reports and Analytics
 import { ReportsPage } from "@/modules/reports/pages/ReportsPage";
@@ -52,6 +53,7 @@ export const AppRoutes: React.FC = () => {
             <Route index element={<Navigate to="/admin/analytics" replace />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="reports" element={<ReportsPage />} />
+            <Route path="predictions" element={<AdminPredictions />} />
             <Route path="users" element={<UsersManagement />} />
             <Route path="roles" element={<RolesManagement />} />
             <Route path="products" element={<ProductsManagement />} />

@@ -15,6 +15,7 @@ import {
   Truck,
   TrendingUp,
   Sliders,
+  Brain,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@core/store/auth.store";
@@ -55,7 +56,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const menuItems = [
     { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-    { label: "Reportes", href: "/admin/reports", icon: TrendingUp },
     { label: "Usuarios", href: "/admin/users", icon: Users },
     { label: "Roles", href: "/admin/roles", icon: Shield },
     { label: "Productos", href: "/admin/products", icon: Package },
@@ -63,7 +63,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     { label: "Marcas", href: "/admin/brands", icon: Store },
     { label: "Pedidos", href: "/admin/orders", icon: FileText },
     { label: "Envíos", href: "/admin/shipments", icon: Truck },
-    { label: "Configuración", href: "/admin/settings", icon: Sliders },
+    { label: "Reportes", href: "/admin/reports", icon: TrendingUp },
+    { label: "Predicciones", href: "/admin/predictions", icon: Brain },
   ];
 
   return (
