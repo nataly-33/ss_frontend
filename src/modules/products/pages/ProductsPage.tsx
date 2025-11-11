@@ -5,12 +5,19 @@ import { ProductCard } from "@modules/products/components/ProductCard";
 import { ProductFilters } from "@modules/products/components/ProductFilters";
 import { productsService } from "../services/products.service";
 import type { Product } from "../types";
+import { Pagination } from "@shared/components/ui/Pagination";
 
 export const ProductsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [page, setPage] = useState<number>(() => {
+    const p = Number(searchParams.get("page") || "1");
+    return Number.isNaN(p) || p < 1 ? 1 : p;
+  });
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(12);
 
   const [filters, setFilters] = useState({
     categories: [],
@@ -33,7 +40,7 @@ export const ProductsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    loadProducts();
+    loadProducts(page);
   }, [filters, searchParams]);
 
   const loadFilterOptions = async () => {
@@ -52,23 +59,46 @@ export const ProductsPage: React.FC = () => {
     }
   };
 
-  const loadProducts = async () => {
+  const loadProducts = async (requestedPage = 1) => {
     try {
       setLoading(true);
-      const params = {
-        ...filters,
-        categories: filters.categories.join(","),
-        brands: filters.brands.join(","),
-        colors: filters.colors.join(","),
-        sizes: filters.sizes.join(","),
-        precio_min: Number(filters.priceMin) || 0,
-        precio_max: Number(filters.priceMax) || 0,
-        featured: searchParams.get("featured"),
-        new: searchParams.get("new"),
-      } as any;
+      // Build params mapping to what the backend expects
+      const params: any = {};
+
+      // categories -> categorias (comma separated ids)
+      if (filters.categories?.length)
+        params.categorias = filters.categories.join(",");
+      // brands -> marca (comma separated ids)
+      if (filters.brands?.length) params.marca = filters.brands.join(",");
+      if (filters.colors?.length) params.color = filters.colors.join(",");
+
+      // price filters: only include when set
+      if (filters.priceMin) params.precio_min = Number(filters.priceMin);
+      if (filters.priceMax) params.precio_max = Number(filters.priceMax);
+
+      // sizes: backend expects 'talla' (single id) or filter by stocks via another endpoint.
+      // If the UI sends a single size id, map it; otherwise skip.
+      if (filters.sizes && filters.sizes.length === 1)
+        params.talla = filters.sizes[0];
+
+      // map featured/new query params from URL to backend names
+      const featured =
+        searchParams.get("featured") ?? searchParams.get("destacada");
+      const isNew = searchParams.get("new") ?? searchParams.get("es_novedad");
+      if (featured) params.destacada = featured;
+      if (isNew) params.es_novedad = isNew;
+      // page
+      params.page = requestedPage;
 
       const data = await productsService.getProducts(params);
       setProducts(data.results ?? []);
+      setTotalCount(data.count ?? 0);
+      setPageSize(data.results?.length ?? pageSize);
+      setPage(requestedPage);
+      // keep URL in sync
+      const sp: any = Object.fromEntries(Array.from(searchParams.entries()));
+      sp.page = String(requestedPage);
+      setSearchParams(sp);
     } catch (error) {
       console.error("Error loading products:", error);
     } finally {
@@ -193,6 +223,14 @@ export const ProductsPage: React.FC = () => {
                 ))}
               </div>
             )}
+
+            {/* Pagination */}
+            <Pagination
+              total={totalCount}
+              pageSize={pageSize || Math.max(1, products.length)}
+              currentPage={page}
+              onPageChange={(p) => loadProducts(p)}
+            />
           </div>
         </div>
       </div>

@@ -166,10 +166,30 @@ export const HomePage: React.FC = () => {
   );
 };
 
-// Categorías de ejemplo
+// Categorías con URLs de S3
 const categories = [
-  { id: 1, name: "Vestidos", image: "/images/categories/vestidos.jpg" },
-  { id: 2, name: "Blusas", image: "/images/categories/blusas.jpg" },
-  { id: 3, name: "Pantalones", image: "/images/categories/pantalones.jpg" },
-  { id: 4, name: "Faldas", image: "/images/categories/faldas.jpg" },
+  {
+    id: 1,
+    name: "Vestidos",
+    image:
+      "https://smart-sales-2025-media.s3.us-east-1.amazonaws.com/categorias/vestidos.jpg",
+  },
+  {
+    id: 2,
+    name: "Blusas",
+    image:
+      "https://smart-sales-2025-media.s3.us-east-1.amazonaws.com/categorias/blusas.jfif",
+  },
+  {
+    id: 3,
+    name: "Pantalones",
+    image:
+      "https://smart-sales-2025-media.s3.us-east-1.amazonaws.com/categorias/jeans.webp",
+  },
+  {
+    id: 4,
+    name: "Chaquetas",
+    image:
+      "https://smart-sales-2025-media.s3.us-east-1.amazonaws.com/categorias/jackets.webp",
+  },
 ];

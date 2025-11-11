@@ -114,49 +114,57 @@ export const ProductDetailPage: React.FC = () => {
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Images */}
           <div>
-            {/* Main Image */}
-            <Swiper
-              modules={[Navigation, Thumbs]}
-              navigation
-              thumbs={{
-                swiper:
-                  thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
-              }}
-              className="mb-4 rounded-2xl overflow-hidden aspect-[3/4] bg-neutral-100"
-            >
-              {allImages.map((image, index) => (
-                <SwiperSlide key={index}>
-                  <img
-                    src={image}
-                    alt={`${product.nombre} - ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+            <div className="flex justify-center">
+              <div className="w-full max-w-md p-4 bg-neutral-100 rounded-2xl">
+                {/* Main Image */}
+                <Swiper
+                  modules={[Navigation, Thumbs]}
+                  navigation
+                  thumbs={{
+                    swiper:
+                      thumbsSwiper && !thumbsSwiper.destroyed
+                        ? thumbsSwiper
+                        : null,
+                  }}
+                  className="rounded-lg w-full"
+                >
+                  {allImages.map((image, index) => (
+                    <SwiperSlide key={index}>
+                      <img
+                        src={image}
+                        alt={`${product.nombre} - ${index + 1}`}
+                        className="w-full h-64 md:h-96 object-contain"
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
 
-            {/* Thumbnails */}
-            {allImages.length > 1 && (
-              <Swiper
-                modules={[FreeMode, Thumbs]}
-                onSwiper={setThumbsSwiper}
-                spaceBetween={10}
-                slidesPerView={4}
-                freeMode
-                watchSlidesProgress
-                className="thumbs-swiper"
-              >
-                {allImages.map((image, index) => (
-                  <SwiperSlide key={index}>
-                    <img
-                      src={image}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="w-full aspect-square object-cover rounded-lg cursor-pointer"
-                    />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            )}
+                {/* Thumbnails */}
+                {allImages.length > 1 && (
+                  <div className="mt-4">
+                    <Swiper
+                      modules={[FreeMode, Thumbs]}
+                      onSwiper={setThumbsSwiper}
+                      spaceBetween={10}
+                      slidesPerView={4}
+                      freeMode
+                      watchSlidesProgress
+                      className="thumbs-swiper"
+                    >
+                      {allImages.map((image, index) => (
+                        <SwiperSlide key={index}>
+                          <img
+                            src={image}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="w-full aspect-square object-cover rounded-lg cursor-pointer"
+                          />
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Product Info */}

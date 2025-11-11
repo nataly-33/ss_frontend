@@ -28,7 +28,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     }
 
     // Verificar que el producto tenga tallas disponibles
-    if (!product.tallas_disponibles_detalle || product.tallas_disponibles_detalle.length === 0) {
+    if (
+      !product.tallas_disponibles_detalle ||
+      product.tallas_disponibles_detalle.length === 0
+    ) {
       alert("No hay tallas disponibles para este producto");
       return;
     }
@@ -38,8 +41,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
     // Add to backend cart
     try {
-      await cartService.addItem({ prenda_id: product.id, talla_id: defaultSize.id, cantidad: 1 });
-      alert(`Agregado al carrito: ${product.nombre} - Talla ${defaultSize.nombre}`);
+      await cartService.addItem({
+        prenda_id: product.id,
+        talla_id: defaultSize.id,
+        cantidad: 1,
+      });
+      alert(
+        `Agregado al carrito: ${product.nombre} - Talla ${defaultSize.nombre}`
+      );
     } catch (err: any) {
       console.error("Error adding to cart:", err);
       alert(err.response?.data?.error || "Error al agregar al carrito");
@@ -60,22 +69,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <div className="group">
-      <Link 
-        to={PUBLIC_ROUTES.PRODUCT_DETAIL(product.slug)} 
+      <Link
+        to={PUBLIC_ROUTES.PRODUCT_DETAIL(product.slug)}
         className="block bg-white overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 "
         style={{
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 15px rgba(0, 0, 0, 0.1)',
+          boxShadow:
+            "0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 15px rgba(0, 0, 0, 0.1)",
         }}
       >
-        {/* Image */}
-        <div className="relative aspect-[3/4] overflow-hidden bg-neutral-light">
+        {/* Image: reduced physical size for better perceived quality */}
+        <div className="relative h-40 md:h-44 lg:h-48 overflow-hidden bg-neutral-light rounded-t-lg">
           <img
             src={product.imagen_principal || "/images/placeholder.jpg"}
             alt={product.nombre}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-            style={{
-              filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))',
-            }}
+            style={{ filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12))" }}
           />
 
           {/* Badges */}
