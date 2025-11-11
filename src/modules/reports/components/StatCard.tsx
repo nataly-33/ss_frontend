@@ -1,11 +1,5 @@
-/**
- * StatCard Component
- *
- * Tarjeta para mostrar una estadística con icono
- */
-
-import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import React from "react";
+import type { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -23,8 +17,8 @@ export const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
   icon: Icon,
-  iconColor = 'text-blue-600',
-  iconBgColor = 'bg-blue-100',
+  iconColor = "text-blue-600",
+  iconBgColor = "bg-blue-100",
   trend,
 }) => {
   return (
@@ -36,10 +30,10 @@ export const StatCard: React.FC<StatCardProps> = ({
           {trend && (
             <p
               className={`mt-2 text-sm ${
-                trend.isPositive ? 'text-green-600' : 'text-red-600'
+                trend.isPositive ? "text-green-600" : "text-red-600"
               }`}
             >
-              {trend.isPositive ? '↑' : '↓'} {trend.value}
+              {trend.isPositive ? "↑" : "↓"} {trend.value}
             </p>
           )}
         </div>

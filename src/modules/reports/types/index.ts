@@ -3,10 +3,10 @@
  */
 
 // Tipos de reportes soportados
-export type ReportType = 'ventas' | 'productos' | 'clientes' | 'analytics';
+export type ReportType = "ventas" | "productos" | "clientes" | "analytics";
 
 // Formatos de exportación
-export type ReportFormat = 'pdf' | 'excel' | 'csv';
+export type ReportFormat = "pdf" | "excel" | "csv";
 
 // Request para generar reporte desde prompt
 export interface GenerateReportRequest {
@@ -30,6 +30,7 @@ export interface AnalyticsOverview {
   summary: Summary;
   inventory_summary: InventorySummary;
   customer_analytics: CustomerAnalytics;
+  yearly_comparison?: YearlyComparison; // Opcional para retrocompatibilidad
 }
 
 // Ventas por mes
@@ -100,6 +101,41 @@ export interface CustomerAnalytics {
     order_count: number;
   } | null;
   average_order_value: number;
+}
+
+// Ventas por mes para comparativa
+export interface YearMonthSales {
+  mes: string;
+  total: number;
+  pedidos: number;
+}
+
+// Datos de un año específico
+export interface YearData {
+  total_ventas: number;
+  total_pedidos: number;
+  nuevos_clientes: number;
+  nuevos_productos: number;
+  ticket_promedio: number;
+  ventas_por_mes: YearMonthSales[];
+}
+
+// Comparativa entre años
+export interface YearlyComparison {
+  year_2024: YearData;
+  year_2025: YearData;
+  comparison: {
+    cambio_ventas_porcentaje: number;
+    cambio_ventas_absoluto: number;
+    cambio_pedidos_porcentaje: number;
+    cambio_pedidos_absoluto: number;
+    cambio_clientes_porcentaje: number;
+    cambio_clientes_absoluto: number;
+    cambio_productos_porcentaje: number;
+    cambio_productos_absoluto: number;
+    cambio_ticket_porcentaje: number;
+    cambio_ticket_absoluto: number;
+  };
 }
 
 // Parámetros para analytics

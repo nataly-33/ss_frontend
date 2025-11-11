@@ -1,10 +1,4 @@
-/**
- * AnalyticsPage
- *
- * Dashboard con visualizaciones y estadísticas del sistema
- */
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   TrendingUp,
   Package,
@@ -12,10 +6,10 @@ import {
   ShoppingCart,
   BarChart3,
   AlertTriangle,
-} from 'lucide-react';
-import { StatCard } from '../components/StatCard';
-import { analyticsService } from '../services/reports.service';
-import type {Analytics Overview } from '../types';
+} from "lucide-react";
+import { StatCard } from "../components/StatCard";
+import { analyticsService } from "../services/reports.service";
+import type { AnalyticsOverview } from "../types";
 
 export const AnalyticsPage: React.FC = () => {
   const [data, setData] = useState<AnalyticsOverview | null>(null);
@@ -35,8 +29,8 @@ export const AnalyticsPage: React.FC = () => {
       });
       setData(analyticsData);
     } catch (err) {
-      console.error('Error al cargar analytics:', err);
-      setError('Error al cargar los datos');
+      console.error("Error al cargar analytics:", err);
+      setError("Error al cargar los datos");
     } finally {
       setIsLoading(false);
     }
@@ -59,7 +53,7 @@ export const AnalyticsPage: React.FC = () => {
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <AlertTriangle className="h-12 w-12 text-red-600 mx-auto mb-4" />
           <p className="text-red-800">
-            {error || 'No se pudieron cargar los datos'}
+            {error || "No se pudieron cargar los datos"}
           </p>
           <button
             onClick={loadAnalytics}
@@ -94,14 +88,16 @@ export const AnalyticsPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Total Ventas"
-          value={`Bs. ${summary.total_sales.toLocaleString('es-BO', {
+          value={`Bs. ${summary.total_sales.toLocaleString("es-BO", {
             minimumFractionDigits: 2,
           })}`}
           icon={TrendingUp}
           iconColor="text-green-600"
           iconBgColor="bg-green-100"
           trend={{
-            value: `Bs. ${summary.sales_this_month.toLocaleString('es-BO')} este mes`,
+            value: `Bs. ${summary.sales_this_month.toLocaleString(
+              "es-BO"
+            )} este mes`,
             isPositive: true,
           }}
         />
@@ -164,7 +160,7 @@ export const AnalyticsPage: React.FC = () => {
                       {item.month}
                     </span>
                     <span className="text-gray-600">
-                      Bs. {item.total_sales.toLocaleString('es-BO')}
+                      Bs. {item.total_sales.toLocaleString("es-BO")}
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
@@ -203,7 +199,7 @@ export const AnalyticsPage: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="font-semibold text-gray-900">
-                    Bs. {product.total_revenue.toLocaleString('es-BO')}
+                    Bs. {product.total_revenue.toLocaleString("es-BO")}
                   </p>
                   <p className="text-xs text-gray-500">
                     Bs. {product.price} c/u
