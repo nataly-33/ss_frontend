@@ -71,7 +71,7 @@ export const AnalyticsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Header */}
+      {/* Header
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <BarChart3 className="h-8 w-8 text-blue-600" />
@@ -82,7 +82,7 @@ export const AnalyticsPage: React.FC = () => {
         <p className="text-gray-600">
           Visualiza el rendimiento de tu negocio en tiempo real
         </p>
-      </div>
+      </div>*/}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

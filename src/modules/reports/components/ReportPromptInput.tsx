@@ -184,11 +184,6 @@ export const ReportPromptInput: React.FC<ReportPromptInputProps> = ({
               {isListening ? "Escuchando..." : "Voz"}
             </button>
           </div>
-          <p className="mt-2 text-sm text-gray-500">
-            Puedes usar texto o voz. Especifica el formato en el prompt (PDF,
-            Excel o CSV). Ejemplos: "Top 10 productos más vendidos en Excel",
-            "Clientes del año 2025 en CSV"
-          </p>
         </div>
 
         {/* Submit Button */}
@@ -213,30 +208,38 @@ export const ReportPromptInput: React.FC<ReportPromptInputProps> = ({
 
       {/* Examples */}
       <div className="mt-6 border-t pt-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">
+        <h3 className="text-sm font-medium text-gray-700 mb-3">
           Ejemplos de prompts:
         </h3>
-        <ul className="space-y-1 text-sm text-gray-600">
+        <ul className="space-y-1.5 text-sm text-gray-600">
           <li
-            className="cursor-pointer hover:text-blue-600"
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
             onClick={() => setPrompt("Ventas del año 2025 en PDF")}
           >
             • "Ventas del año 2025 en PDF"
           </li>
           <li
-            className="cursor-pointer hover:text-blue-600"
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
             onClick={() => setPrompt("Top 10 productos más vendidos en Excel")}
           >
             • "Top 10 productos más vendidos en Excel"
           </li>
           <li
-            className="cursor-pointer hover:text-blue-600"
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
             onClick={() => setPrompt("Clientes registrados este año en CSV")}
           >
             • "Clientes registrados este año en CSV"
           </li>
           <li
-            className="cursor-pointer hover:text-blue-600"
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
+            onClick={() =>
+              setPrompt("Ventas del 01/11/2024 al 01/05/2025 en Excel")
+            }
+          >
+            • "Ventas del 01/11/2024 al 01/05/2025 en Excel"
+          </li>
+          <li
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
             onClick={() =>
               setPrompt("Pedidos del primer trimestre 2024 en PDF")
             }
@@ -244,12 +247,48 @@ export const ReportPromptInput: React.FC<ReportPromptInputProps> = ({
             • "Pedidos del primer trimestre 2024 en PDF"
           </li>
           <li
-            className="cursor-pointer hover:text-blue-600"
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
             onClick={() =>
-              setPrompt("Ventas del 01/10/2024 al 01/01/2025 en Excel")
+              setPrompt("Reporte de ventas agrupadas por categoría en Excel")
             }
           >
-            • "Ventas del 01/10/2024 al 01/01/2025 en Excel"
+            • "Reporte de ventas agrupadas por categoría en Excel"
+          </li>
+          <li
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
+            onClick={() =>
+              setPrompt("Top 5 clientes con más compras del año 2025 en PDF")
+            }
+          >
+            • "Top 5 clientes con más compras del año 2025 en PDF"
+          </li>
+          <li
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
+            onClick={() =>
+              setPrompt("Ventas agrupadas por mes del año 2024 en CSV")
+            }
+          >
+            • "Ventas agrupadas por mes del año 2024 en CSV"
+          </li>
+          <li
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
+            onClick={() =>
+              setPrompt(
+                "Productos más vendidos agrupados por categoría en Excel"
+              )
+            }
+          >
+            • "Productos más vendidos agrupados por categoría en Excel"
+          </li>
+          <li
+            className="cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition"
+            onClick={() =>
+              setPrompt(
+                "Pedidos del último semestre agrupados por cliente en PDF"
+              )
+            }
+          >
+            • "Pedidos del último semestre agrupados por cliente en PDF"
           </li>
         </ul>
       </div>

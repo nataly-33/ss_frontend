@@ -67,20 +67,6 @@ export const ReportsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <FileText className="h-8 w-8 text-blue-600" />
-          <h1 className="text-3xl font-bold text-gray-900">
-            Reportes Dinámicos
-          </h1>
-        </div>
-        <p className="text-gray-600">
-          Genera reportes personalizados usando lenguaje natural. Puedes
-          escribir o usar comandos de voz.
-        </p>
-      </div>
-
       {/* Comparativa 2024 vs 2025 */}
       {yearlyData && (
         <div className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow-md p-6">
@@ -407,17 +393,6 @@ export const ReportsPage: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* Help */}
-          <div className="bg-blue-50 rounded-lg p-6">
-            <h3 className="font-semibold text-blue-900 mb-2">Cómo funciona</h3>
-            <ul className="space-y-2 text-sm text-blue-800">
-              <li>1. Escribe o usa voz para describir tu reporte</li>
-              <li>2. Selecciona el formato (PDF, Excel, CSV)</li>
-              <li>3. Haz clic en "Generar Reporte"</li>
-              <li>4. El archivo se descargará automáticamente</li>
-            </ul>
           </div>
         </div>
       </div>
