@@ -17,7 +17,11 @@ export const AdminDashboard: React.FC = () => {
     if (location.pathname === "/admin/orders") return "Gestión de Pedidos";
     if (location.pathname === "/admin/shipments") return "Gestión de Envíos";
     if (location.pathname === "/admin/settings") return "Configuración";
-    if (location.pathname === "/admin/reports") return "Reportes";
+    if (location.pathname === "/admin/reports") return "Reportes Dinámicos";
+    if (location.pathname === "/admin/analytics") return "Estadísticas";
+    if (location.pathname === "/admin/predictions")
+      return "Predicciones con AI";
+
     return "Panel de Administración";
   };
 

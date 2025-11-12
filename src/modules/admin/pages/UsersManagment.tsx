@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { Button } from "@shared/components/ui/Button";
 import { usersService, rolesService } from "../services/admin.service";
 import type { User, Role } from "../types";
-import {
-  DataTable,
-  SearchBar,
-  StatusBadge,
-  RoleBadge,
-  commonActions,
-  type Column,
-  type Action,
-} from "../components";
+import { SearchBar } from "../components";
+import { Pagination } from "@shared/components/ui/Pagination";
 
 export const UsersManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -154,64 +147,28 @@ export const UsersManagement: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const columns: Column<User>[] = [
-    {
-      key: "nombre_completo",
-      label: "Usuario",
-      sortable: true,
-      render: (user) => (
-        <div>
-          <p className="font-medium text-neutral-900">{user.nombre_completo}</p>
-          <p className="text-sm text-neutral-500">{user.email}</p>
-        </div>
-      ),
-    },
-    {
-      key: "rol",
-      label: "Rol",
-      render: (user) => <RoleBadge role={user.rol_detalle?.nombre} />,
-    },
-    {
-      key: "activo",
-      label: "Estado",
-      render: (user) => <StatusBadge status={user.activo} />,
-    },
-    {
-      key: "created_at",
-      label: "Fecha de Registro",
-      sortable: true,
-      render: (user) => (
-        <span className="text-sm text-neutral-500">
-          {new Date(user.created_at).toLocaleDateString("es-ES")}
-        </span>
-      ),
-    },
-  ];
-
-  const actions: Action<User>[] = [
-    {
-      label: "Editar",
-      icon: commonActions.edit,
-      onClick: handleEdit,
-      variant: "primary",
-    },
-    {
-      label: "Eliminar",
-      icon: commonActions.delete,
-      onClick: handleDelete,
-      variant: "danger",
-    },
-  ];
+  const getRoleBadgeColor = (roleName: string) => {
+    switch (roleName?.toLowerCase()) {
+      case "admin":
+        return "bg-red-100 text-red-700";
+      case "vendedor":
+        return "bg-blue-100 text-blue-700";
+      case "cliente":
+        return "bg-green-100 text-green-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* SearchBar + Nuevo Usuario en misma fila */}
-      <div className="flex gap-4 items-center">
-        <div className="flex-1 bg-white rounded-xl shadow-sm p-4">
+      <div className="flex gap-3 items-center">
+        <div className="flex-1 bg-white rounded-lg shadow-sm p-3">
           <SearchBar
             value={searchTerm}
             onChange={setSearchTerm}
-            placeholder="Buscar usuarios..."
+            placeholder="Buscar usuarios por nombre o email..."
           />
         </div>
         <Button variant="primary" size="lg" onClick={handleCreate}>
@@ -220,20 +177,121 @@ export const UsersManagement: React.FC = () => {
         </Button>
       </div>
 
-      {/* Table with Scroll Limit */}
-      <div className="max-h-[60vh] overflow-y-auto">
-        <DataTable
-          data={users}
-          columns={columns}
-          actions={actions}
-          loading={loading}
-          emptyMessage="No se encontraron usuarios"
-          totalCount={totalCount}
-          pageSize={pageSize}
-          currentPage={page}
-          onPageChange={(p) => loadData(p)}
-        />
-      </div>
+      {/* Users Table */}
+      {loading ? (
+        <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+        </div>
+      ) : (
+        <>
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-neutral-50 border-b border-neutral-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-700">
+                      Usuario
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-700">
+                      Rol
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-700">
+                      Teléfono
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-700">
+                      Estado
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-700">
+                      Fecha de Registro
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-700">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-200">
+                  {users.map((user) => (
+                    <tr key={user.id} className="hover:bg-neutral-50">
+                      <td className="px-4 py-3">
+                        <div>
+                          <p className="text-xs font-medium text-neutral-900">
+                            {user.nombre_completo}
+                          </p>
+                          <p className="text-xs text-neutral-500">
+                            {user.email}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`px-2 py-0.5 text-xs font-medium rounded-full ${getRoleBadgeColor(
+                            user.rol_detalle?.nombre
+                          )}`}
+                        >
+                          {user.rol_detalle?.nombre || "Sin rol"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-neutral-600">
+                        {user.telefono || "-"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                            user.activo
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {user.activo ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-neutral-600">
+                        {new Date(user.created_at).toLocaleDateString("es-ES")}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => handleEdit(user)}
+                            className="p-1.5 hover:bg-primary-50 rounded-lg text-primary-600"
+                            title="Editar usuario"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(user)}
+                            className="p-1.5 hover:bg-red-50 rounded-lg text-red-600"
+                            title="Eliminar usuario"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Pagination */}
+          {totalCount > pageSize && (
+            <div className="p-3 bg-white rounded-lg shadow-sm border-t border-neutral-200">
+              <Pagination
+                total={totalCount}
+                pageSize={pageSize}
+                currentPage={page}
+                onPageChange={(newPage) => loadData(newPage)}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {users.length === 0 && !loading && (
+        <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+          <p className="text-neutral-600">No se encontraron usuarios</p>
+        </div>
+      )}
 
       {/* Form Modal */}
       {showForm && (

@@ -162,6 +162,42 @@ export const rolesService = {
 };
 
 // PRODUCTS
+// Helper function to sort products: 1) Con imagen primero, 2) Blusas primero
+const sortProductsByImage = (products: Product[]): Product[] => {
+  return [...products].sort((a, b) => {
+    const aHasImage =
+      a.imagen_principal &&
+      a.imagen_principal !== null &&
+      a.imagen_principal.trim() !== "";
+    const bHasImage =
+      b.imagen_principal &&
+      b.imagen_principal !== null &&
+      b.imagen_principal.trim() !== "";
+
+    // Verificar si es categoría Blusas
+    const aIsBlusas =
+      a.categorias_detalle?.some(
+        (cat) => cat.nombre?.toLowerCase() === "blusas"
+      ) ?? false;
+    const bIsBlusas =
+      b.categorias_detalle?.some(
+        (cat) => cat.nombre?.toLowerCase() === "blusas"
+      ) ?? false;
+
+    // PRIORIDAD 1: Productos con imagen van primero
+    if (aHasImage && !bHasImage) return -1;
+    if (!aHasImage && bHasImage) return 1;
+
+    // PRIORIDAD 2: Entre los que tienen imagen, Blusas primero
+    if (aHasImage && bHasImage) {
+      if (aIsBlusas && !bIsBlusas) return -1;
+      if (!aIsBlusas && bIsBlusas) return 1;
+    }
+
+    return 0;
+  });
+};
+
 export const productsService = {
   async getAll(filters?: ProductFilters): Promise<PaginatedResponse<Product>> {
     try {
@@ -182,6 +218,12 @@ export const productsService = {
       if (filters?.page) params.append("page", String(filters.page));
 
       const response = await api.get(`${ENDPOINTS.PRODUCTS.BASE}?${params}`);
+
+      // Sort products to show those with images first (mejor UX en admin)
+      if (response.data.results) {
+        response.data.results = sortProductsByImage(response.data.results);
+      }
+
       return response.data;
     } catch (error: any) {
       console.error("Error fetching products:", error.response?.data);
