@@ -77,13 +77,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             "0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 15px rgba(0, 0, 0, 0.1)",
         }}
       >
-        {/* Image: reduced physical size for better perceived quality */}
-        <div className="relative h-40 md:h-44 lg:h-48 overflow-hidden bg-neutral-light rounded-t-lg">
+        {/* Image: same style as admin/products - object-contain with white background */}
+        <div className="relative h-40 md:h-44 lg:h-48 overflow-hidden bg-white rounded-t-lg flex items-center justify-center">
           <img
             src={product.imagen_principal || "/images/placeholder.jpg"}
             alt={product.nombre}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-            style={{ filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12))" }}
+            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
           />
 
           {/* Badges */}
