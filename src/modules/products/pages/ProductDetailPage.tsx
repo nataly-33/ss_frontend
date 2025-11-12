@@ -94,10 +94,10 @@ export const ProductDetailPage: React.FC = () => {
     return null;
   }
 
-  const images = product.imagenes || [];
+  const images = product.imagenes_url || [];
   const mainImage = product.imagen_principal || "/images/placeholder.jpg";
   const allImages =
-    images.length > 0 ? images.map((img: any) => img.imagen) : [mainImage];
+    images.length > 0 ? images.map((img: any) => img.imagen_url) : [mainImage];
 
   return (
     <div className="min-h-screen bg-background-primary">

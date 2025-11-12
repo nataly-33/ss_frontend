@@ -16,7 +16,13 @@ export interface Product {
   material?: string;
   slug: string;
   tallas_disponibles_detalle: Size[];
-  imagenes?: Array<{ id: string; imagen: string; es_principal: boolean; orden: number }>;
+  imagenes_url?: Array<{
+    id: string;
+    imagen_url: string;
+    es_principal: boolean;
+    orden: number;
+    alt_text?: string;
+  }>;
   imagen_principal: string | null;
   stock_total: number;
   tiene_stock: boolean;
